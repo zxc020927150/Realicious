@@ -1,0 +1,96 @@
+<style>
+  /* 全域背景設定：使用微漸層增加質感 */
+  body {
+    background: linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 登入容器居中與卡片化 */
+  .box {
+    width: 600px;
+    max-width: 800px; /* 登入頁通常窄一點比較好看 */
+    background: #ffffff;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    margin: auto; /* 配合 flex 實現垂直居中 */
+  }
+
+  /* 標籤與輸入框 */
+  .form-label {
+    font-weight: 600;
+    color: #4a5568;
+    text-transform: capitalize; /* 讓 account 自動首字母大寫 */
+  }
+
+  .form-control {
+    border-radius: 10px;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
+
+  /* 按鈕樣式：包含禁用狀態的視覺處理 */
+  
+
+  /* 錯誤訊息美化：取代原本的內聯樣式 */
+  .error-box {
+    color: #e53e3e;
+    background-color: #fff5f5;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    border-left: 4px solid #e53e3e;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+  }
+  h2 {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-left: 5px solid #0d6efd;
+    padding-left: 15px;
+  }
+</style>
+
+
+<%- include('partials/hua_html_head.ejs') %>
+<%- include('partials/hua_html_navbar.ejs') %>
+
+  
+  <div class="box">
+    <form method="post" action="/login">
+      <h2>登入</h2>
+      <br>
+      <div class="mb-3">
+        <label for="account" class="form-label">帳號</label>
+        <input type="text" class="form-control" id="account" name="account">
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">密碼</label>
+        <input type="password" class="form-control" id="password" name="password">
+      </div>
+      <br>
+      <% if(loginUser) {%>
+      <button type="submit" class="btn btn-primary" disabled>Submit</button>
+      <% }else{ %>
+      <button type="submit" class="btn btn-primary">Submit</button>
+      <% } %>
+  </form>
+  <br>
+  <% if (message.length > 0) { %>
+  <div style="color: red; background-color: #ffe6e6; padding: 10px; border-radius: 5px;">
+    ⚠️ <%= message %>
+  </div>
+  <% } %>
+  </div>
+  
+<%- include('partials/hua_html_end.ejs') %>

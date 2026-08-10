@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+		/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      /* body {
+        background-color: #f8f9fa;
+      } */
+      .nav-link-custom {
+        color: white;
+        text-decoration: none;
+      }
+      .point-plus {
+        color: #198754;
+        font-weight: bold;
+      } /* 增加點數用綠色 */
+      .point-minus {
+        color: #dc3545;
+        font-weight: bold;
+      } /* 減少點數用紅色 */
+      .a1 {
+        color: white;
+        text-decoration: none;
+      }
+        .search-bar {
+        background-color: #e9ecef;
+        border-top: 1px solid #dee2e6;
+      }
+      .navbar-nav a.nav-link.active {
+        border-radius: 5px;
+        background-color: #0d6efd;
+        color: white;
+        font-weight: 800;
+      }
+    </style>
+        <script>
+			(function() {
+				const savedTheme = localStorage.getItem("theme") || "light";
+				document.documentElement.setAttribute("data-bs-theme", savedTheme);
+			})();
+		</script>
+    <title>紅利點數管理中心</title>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header  text-white">
+          <div
+            class="d-flex align-items-center justify-content-between flex-wrap"
+          >
+            <!-- 左側導覽：減少 gap 避免擠壓 -->
+            <div class="container">
+          <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/">YumWay ლ(´ڡ`ლ)</a>
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-list' ? 'active' : '' %>"
+                      href="admin.html"
+                      >商城管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-announcement' ? 'active' : '' %>"
+                      href="tags.html"
+                      >標籤管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-categories' ? 'active' : '' %>"
+                      href="orders.html"
+                      >訂單管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-report' ? 'active' : '' %>"
+                      href="points.html"
+                      >紅利管理</a
+                    >
+                  </li>
+                </ul>
+                <button
+                  class="btn btn-primary myThemeBtn"
+                  onclick="toggleTheme()"
+                >
+                  暗或亮
+                </button>
+              </div>
+            </div>
+          </nav>
+        </div>
+
+            <!-- 右側搜尋區：限制 input 寬度並保持水平 -->
+            <div class="d-flex gap-2 mt-2 mt-lg-0" style="max-width: 400px">
+              <input
+                type="text"
+                id="searchInput"
+                class="form-control form-control-sm"
+                placeholder="搜尋 帳號或會員ID..."
+                style="width: 180px"
+              />
+              <button
+                class="btn btn-sm btn-info text-nowrap"
+                onclick="doSearch()"
+              >
+                搜尋
+              </button>
+              <button
+                class="btn btn-sm btn-warning text-nowrap"
+                onclick="openAdjustModal()"
+              hidden>
+                手動調整
+              </button> 
+              <!-- 寫手動調整的js邏輯再刪除hidden -->
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 text-center">
+            <thead class="table-secondary">
+              <tr>
+                <th>紀錄編號</th>
+                <th>會員帳號</th>
+                <th>點數變動</th>
+                <th>變動後餘額</th>
+                <th>關聯訂單</th>
+                <th>紀錄時間</th>
+              </tr>
+            </thead>
+            <tbody id="point-list">
+              <!-- 資料會透過 JS 渲染到這裡 -->
+            </tbody>
+          </table>
+        </div>
+        <div class="card-footer">
+          <div
+            id="pagination-controls"
+            class="d-flex justify-content-center"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      window.onload = () => {
+        loadPoints();
+      };
+
+      // 搜尋按鈕觸發的函數
+      function doSearch() {
+        const keyword = document.getElementById("searchInput").value;
+        loadPoints(1, keyword); // 搜尋時回到第一頁
+      }
+
+      // 修改 loadPoints，加入 search 參數，預設為空字串
+      async function loadPoints(page = 1, search = "") {
+        try {
+          // 將搜尋關鍵字帶入 API 路徑中
+          const res = await fetch(
+            `/points?page=${page}&search=${search}`,
+          );
+          const result = await res.json();
+
+          if (result.success) {
+            document.getElementById("point-list").innerHTML = result.data
+              .map((log) => {
+                const pointClass =
+                  log.amount >= 0 ? "point-plus" : "point-minus";
+                const pointPrefix = log.amount >= 0 ? "+" : "";
+
+                return `
+            <tr>
+                <td>#${log.id}</td>
+                <td>${log.account || "未知帳號"}</td>
+                <td><span class="${pointClass}">${pointPrefix}${log.amount}</span></td>
+                <td class="fw-bold text-primary">${log.point_after}</td>
+                <td>${log.order_id ? `<span class="badge bg-outline-secondary text-dark border">訂單 #${log.order_id}</span>` : '<span class="text-muted">兌換/手動調整</span>'}</td>
+                <td>${new Date(log.created_at).toLocaleString()}</td>
+            </tr>
+          `;
+              })
+              .join("");
+
+            // 注意：分頁函數也要帶入 search 關鍵字，否則換頁會跳回全部資料
+            renderPagination(result.pagination.totalPages, page, search);
+          }
+        } catch (error) {
+          console.error("載入失敗:", error);
+        }
+      }
+
+      // 修改 renderPagination，確保分頁按鈕點擊時會帶上搜尋關鍵字
+      function renderPagination(total, current, search = "") {
+        let html = "";
+        for (let i = 1; i <= total; i++) {
+          // 在 onclick 裡面多傳入 search 參數
+          html += `
+      <button class="btn btn-sm mx-1 ${i === current ? "btn-primary" : "btn-outline-primary"}" 
+              onclick="loadPoints(${i}, '${search}')">${i}</button>`;
+        }
+        document.getElementById("pagination-controls").innerHTML = html;
+      }
+            function toggleTheme() {
+        const html = document.querySelector("html");
+        const theme = html.getAttribute("data-bs-theme");
+        const newTheme = theme === "dark" ? "light" : "dark";
+
+        html.setAttribute("data-bs-theme", newTheme);
+        localStorage.setItem("theme", newTheme); // 保存到 localStorage
+      }
+    </script>
+  </body>
+</html>

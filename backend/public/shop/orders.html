@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    />
+    <style>
+      .a1 {
+        color: white;
+        text-decoration: none;
+      }
+      .search-bar {
+        /* background-color: #e9ecef; */
+        border-top: 1px solid #dee2e6;
+      }
+      .navbar-nav a.nav-link.active {
+        border-radius: 5px;
+        /* background-color: #0d6efd; */
+        color: white;
+        font-weight: 800;
+      }
+    </style>
+
+    <title>訂單管理中心</title>
+  </head>
+  <body>
+    <div class="container mt-4">
+      <div class="card shadow-sm mb-4">
+        <div class="container">
+          <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="/">YumWay ლ(´ڡ`ლ)</a>
+              <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+              >
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-list' ? 'active' : '' %>"
+                      href="admin.html"
+                      >商城管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-announcement' ? 'active' : '' %>"
+                      href="tags.html"
+                      >標籤管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-categories' ? 'active' : '' %>"
+                      href="orders.html"
+                      >訂單管理</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link <%= pageName === 'articles-report' ? 'active' : '' %>"
+                      href="points.html"
+                      >紅利管理</a
+                    >
+                  </li>
+                </ul>
+                <button
+                  class="btn btn-primary myThemeBtn"
+                  onclick="toggleTheme()"
+                >
+                  暗或亮
+                </button>
+              </div>
+            </div>
+          </nav>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-secondary">
+              <tr>
+                <th class="ps-3">訂單編號</th>
+                <th>會員姓名</th>
+                <th>總金額</th>
+                <th>訂單狀態</th>
+                <th>下單時間</th>
+                <th class="text-center">操作</th>
+              </tr>
+            </thead>
+            <tbody id="order-list"></tbody>
+          </table>
+        </div>
+        <div class="card-footer bg-white">
+          <div
+            id="pagination-controls"
+            class="d-flex justify-content-center"
+          ></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 訂單明細彈窗 -->
+    <div class="modal fade" id="detailModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-info text-white">
+            <h5>訂單明細內容</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>商品 ID</th>
+                  <!-- 新增這一行 -->
+                  <th>商品名稱</th>
+                  <th>成交單價</th>
+                  <th>數量</th>
+                  <th>小計</th>
+                </tr>
+              </thead>
+              <tbody id="detail-list"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let detailModal;
+      window.onload = () => {
+        //從 localStorage 讀取主題
+    const savedTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-bs-theme", savedTheme);
+
+        detailModal = new bootstrap.Modal(
+          document.getElementById("detailModal"),
+        );
+        loadOrders();
+      };
+
+      async function loadOrders(page = 1) {
+        
+        // 定義狀態對應的文字與顏色
+        const statusMap = {
+          10: { text: "待付款", color: "bg-secondary" },
+          20: { text: "已付款", color: "bg-primary" },
+          30: { text: "已完成", color: "bg-success" },
+          99: { text: "已取消", color: "bg-danger" },
+        };
+        // 定義狀態對應的文字與顏色
+
+        const res = await fetch(`/orders?page=${page}`);
+        const result = await res.json();
+if (result.success) {
+        document.getElementById("order-list").innerHTML = result.data
+            .map((o) => {
+                // 2. 取得對應的狀態物件，如果找不到（例如 0）就給一個預設值
+                const currentStatus = statusMap[o.status] || { text: "未知", color: "bg-dark" };
+
+                return `
+                <tr>
+                    <td class="ps-3">#${o.id}</td>
+                    <td>${o.user_name || "訪客"}</td>
+                    <td class="text-danger fw-bold">$${o.total_price}</td>
+                    <td>
+                        <span class="badge ${currentStatus.color}">
+                            ${currentStatus.text}
+                        </span>
+                    </td>
+                    <td>${new Date(o.created_at).toLocaleString()}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary" onclick="showDetail(${o.id})">明細</button>
+                    </td>
+                </tr>
+            `;
+            })
+            .join("");
+          renderPagination(result.pagination.totalPages, page);
+        }
+      }
+
+      async function showDetail(orderId) {
+        const res = await fetch(
+          `/orders/detail/${orderId}`,
+        );
+        const result = await res.json();
+        if (result.success) {
+          document.getElementById("detail-list").innerHTML = result.items
+            .map((item) => {
+              // 修改判斷邏輯：
+              // 1. 如果 item.product_name 是 null (表示商品被刪除了)
+              // 2. 或者 item.is_active 為 0 (表示商品目前被下架了)
+              const isOffShelves = !item.product_name || item.is_active === 0;
+
+              const nameDisplay = isOffShelves
+                ? `<span class="text-danger fw-bold">${item.product_name}已下架 (ID: ${item.product_id})</span>`
+                : item.product_name;
+
+              return `
+                <tr>
+                    <td style="width: 100px;" class="text-secondary">#${item.product_id}</td>
+                    <td>${nameDisplay}</td>
+                    <td class="">$${item.unit_price}</td>
+                    <td class="text-center">${item.quantity}</td>
+                    <td class="fw-bold">$${item.unit_price * item.quantity}</td>
+                </tr>
+            `;
+            })
+            .join("");
+          detailModal.show();
+        }
+      }
+
+      async function deleteOrder(id) {
+        if (!confirm("確定要刪除這筆訂單嗎？這會連同明細一併移除！")) return;
+        const res = await fetch(`/orders/delete/${id}`, {
+          method: "DELETE",
+        });
+        const result = await res.json();
+        if (result.success) loadOrders();
+      }
+
+      function renderPagination(total, current) {
+        let html = "";
+        for (let i = 1; i <= total; i++) {
+          html += `<button class="btn btn-sm mx-1 ${i === current ? "btn-dark" : "btn-outline-dark"}" onclick="loadOrders(${i})">${i}</button>`;
+        }
+        document.getElementById("pagination-controls").innerHTML = html;
+      }
+
+      // 夜間模式主題切換
+      function toggleTheme() {
+        const html = document.querySelector("html");
+        const theme = html.getAttribute("data-bs-theme");
+        const newTheme = theme === "dark" ? "light" : "dark";
+
+        html.setAttribute("data-bs-theme", newTheme);
+        localStorage.setItem("theme", newTheme); // 保存到 localStorage
+      }
+      // 夜間模式主題切換
+    </script>
+  </body>
+</html>

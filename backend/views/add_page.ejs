@@ -1,0 +1,93 @@
+<!-- 注意: EJS 只認 key，不認你原本變數名稱 -->
+<!-- 注意: form裡面用到的name,都要符合POST路由的解構變數 -->
+
+<!-- <h2>新增捷運站</h2>
+
+<form action="/station/add" method="POST">
+  <div>
+    <label>新增站名：</label>
+    <input type = "text" name="_name" autofocus required>
+  </div>
+
+  <div>
+    <label>新增站碼：</label>
+    <input name="_line_code" maxlength="4" placeholder="最多4碼" required>
+  </div>
+
+  <div>
+    <label>新增線路：</label>
+    <select name="_line_type" required>
+      <% rows_line_type.forEach(item => { %>
+        <option value="<%= item.station_line_type_id %>">
+          <%= item.station_line_type_string %>
+        </option>
+      <% }); %>
+    </select>
+  </div>
+
+  <button type="submit">送出</button>
+</form>
+
+<a href="/station/list">查看_捷運站列表</a>
+<br>
+<a href="/">前往_index首頁</a> -->
+
+<!-- 引入 Bootstrap CSS (建議放在 <head> 中) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      
+      <!-- 卡片外框 -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h2 class="h5 mb-0">新增捷運站</h2>
+        </div>
+        
+        <div class="card-body">
+          <!-- 注意: form裡面用到的name,都要符合POST路由的解構變數 -->
+          <form action="/station/add" method="POST">
+            
+            <div class="mb-3">
+              <label class="form-label">新增站名：</label>
+              <input type="text" name="_name" class="form-control" placeholder="例如：台北車站" autofocus required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">新增站碼：</label>
+              <input type="text" name="_line_code" class="form-control" maxlength="4" placeholder="最多4碼，例如：BL12" required>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">新增線路：</label>
+              <select name="_line_type" class="form-select" required>
+                <option value="" selected disabled>請選擇線路...</option>
+                <% rows_line_type.forEach(item => { %>
+                  <option value="<%= item.station_line_type_id %>">
+                    <%= item.station_line_type_string %>
+                  </option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">送出</button>
+            </div>
+          </form>
+        </div>
+        
+        <div class="card-footer bg-light">
+          <div class="d-flex justify-content-between">
+            <a href="/station/list" class="btn btn-outline-secondary btn-sm">查看捷運站列表</a>
+            <a href="/" class="btn btn-link btn-sm text-decoration-none">前往首頁</a>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- 引入 Bootstrap JS (選用，若需要互動功能) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

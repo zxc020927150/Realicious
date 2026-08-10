@@ -1,0 +1,99 @@
+    <div class="flex-1 overflow-y-auto p-8">
+        <h1 class="text-lg font-bold text-gray-700 mb-4">店家管理</h1>
+
+        <!-- 查詢表單 -->
+        <form action="/restaurant" method="GET" class="bg-white p-6 rounded-lg shadow-sm border border-orange-100 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">搜尋店家</label>
+                    <input type="text" name="keyword" value="<%= keyword %>" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent" placeholder="輸入店名或分店名稱...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">吃土模式篩選</label>
+                    <select name="is_poor_mode" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent bg-white">
+                        <option value="">全部顯示</option>
+                        <option value="Y" <%= locals.is_poor_mode === 'Y' ? 'selected' : '' %>>符合吃土模式</option>
+                        <option value="N" <%= locals.is_poor_mode === 'N' ? 'selected' : '' %>>不符合吃土模式</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    查詢
+                </button>
+                <a href="/restaurant" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-block text-center line-height-normal">
+                    清除
+                </a>
+            </div>
+        </form>
+
+        <!-- 結果表格 -->
+        <div class="bg-white rounded-lg shadow-sm border border-orange-100 flex flex-col">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-orange-50/50 rounded-t-lg">
+                <div class="text-sm text-gray-500">找到 <%= totalRows %> 間店家</div>
+                <a href="/restaurant/add" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors shadow-sm flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                新增店家
+                </a>
+            </div>
+
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-600">
+                    <thead class="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3">ID</th>
+                            <th class="px-4 py-3">店名 (分店)</th>
+                            <th class="px-4 py-3">電話</th>
+                            <th class="px-4 py-3">地址</th>
+                            <th class="px-4 py-3">均消</th>
+                            <th class="px-4 py-3">加入時間</th>
+                            <th class="px-4 py-3">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% records.forEach(function(item) { %>
+                        <tr class="hover:bg-orange-50/50 transition-colors">
+                            <td class="px-4 py-3"><%= item.id %></td>
+                            <td class="px-4 py-3 font-medium text-gray-800">
+                                <%= item.name %> 
+                                <% if(item.branch) { %><span class="text-xs text-gray-400 ml-1">(<%= item.branch %>)</span><% } %>
+                            </td>
+                            <td class="px-4 py-3"><%= item.telephone %></td>
+                            <td class="px-4 py-3"><%= item.location %></td>
+                            <td class="px-4 py-3 font-semibold text-orange-600">$<%= item.average_range %></td>
+                            <td class="px-4 py-3 text-gray-400"><%= item.created_at %></td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <!-- 編輯按鈕：把店家的 id 帶在網址後面傳過去 -->
+                                <a href="/restaurant/edit/<%= item.id %>" class="text-blue-500 hover:text-blue-700 font-medium mr-3 transition-colors">編輯</a>
+                                <form action="/restaurant/delete/<%= item.id %>" method="POST" class="inline" onsubmit="return confirm('確定要狠心刪除這家店嗎？刪除後無法復原喔！');">
+                                <button type="submit" class="text-red-500 hover:text-red-700 font-medium transition-colors">刪除</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分頁區塊 -->
+            <div class="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+                <div>
+                    顯示第 <%= totalRows > 0 ? (page - 1) * perPage + 1 : 0 %> 至 
+                    <%= page * perPage > totalRows ? totalRows : page * perPage %> 項結果
+                </div>
+                <div class="flex gap-1">
+                    <a href="?keyword=<%= keyword %>&page=<%= page > 1 ? page - 1 : 1 %>" 
+                    class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === 1 ? 'pointer-events-none opacity-50' : '' %>">上一頁</a>
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <a href="?keyword=<%= keyword %>&page=<%= i %>" 
+                        class="px-3 py-1 rounded <%= page === i ? 'bg-orange-500 text-white' : 'border border-gray-200 hover:bg-gray-50 text-gray-700' %>"><%= i %></a>
+                    <% } %>
+                    <a href="?keyword=<%= keyword %>&page=<%= page < totalPages ? page + 1 : totalPages %>" 
+                    class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === totalPages ? 'pointer-events-none opacity-50' : '' %>">下一頁</a>
+                </div>
+            </div>
+        </div>
+    </div>

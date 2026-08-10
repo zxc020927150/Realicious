@@ -1,0 +1,111 @@
+<!-- 注意: EJS 只認 key，不認你原本變數名稱 -->
+<!-- <h2>捷運站_編輯頁面</h2>
+
+<form action="/station/edit/<%= station.id %>" method="POST">
+  <div>
+    <label>站名：</label>
+    <input type = "text" name="name" value="<%= station.name %>" required>
+  </div>
+
+  <hr>
+  <h3>線路資訊</h3>
+  <% currentLine.forEach((line, index) => { %>
+    <div class="line-row">
+      <label>站碼：</label>
+      <input type="text" name="line_codes[]" value="<%= line.code %>" maxlength="4" placeholder="最多4碼" required>
+      
+      <label>線路類型：</label>
+      <select name="line_types[]" required>
+  <% types.forEach(t => { %>
+    <option value="<%= t.station_line_type_id %>" 
+      <%= t.station_line_type_id === line.type_id ? 'selected' : '' %>>
+      <%= t.station_line_type_string %>
+    </option>
+  <% }) %>
+</select>
+    </div>
+  <% }) %>
+
+  <button type="submit">確定修改</button>
+</form> -->
+
+
+<!-- 引入 Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <!-- 標題區 -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-bold mb-0">
+          <i class="bi bi-pencil-square"></i> 捷運站編輯
+        </h2>
+        <a href="/station/list" class="btn btn-outline-secondary btn-sm">返回列表</a>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <form action="/station/edit/<%= station.id %>" method="POST">
+          
+          <div class="card-body p-4">
+            <!-- 基本資訊區 -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">站名設定</label>
+              <input type="text" name="name" class="form-control form-control-lg" 
+                     value="<%= station.name %>" placeholder="請輸入站名" required>
+              <div class="form-text">這會是顯示在系統上的主要站名。</div>
+            </div>
+
+            <hr class="my-4 opacity-25">
+
+            <!-- 線路資訊區 -->
+            <h3 class="h5 mb-3 fw-bold text-secondary">線路與站碼資訊</h3>
+            
+            <% currentLine.forEach((line, index) => { %>
+              <div class="line-row p-3 mb-3 bg-light rounded-3 border">
+                <div class="row g-3">
+                  <!-- 站碼 -->
+                  <div class="col-md-4">
+                    <label class="form-label small text-muted">站碼 (Code)</label>
+                    <input type="text" name="line_codes[]" class="form-control" 
+                           value="<%= line.code %>" maxlength="4" placeholder="例如: BL12" required>
+                  </div>
+                  
+                  <!-- 線路類型 -->
+                  <div class="col-md-8">
+                    <label class="form-label small text-muted">線路類型</label>
+                    <select name="line_types[]" class="form-select" required>
+                      <% types.forEach(t => { %>
+                        <option value="<%= t.station_line_type_id %>" 
+                          <%= t.station_line_type_id === line.type_id ? 'selected' : '' %>>
+                          <%= t.station_line_type_string %>
+                        </option>
+                      <% }) %>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            <% }) %>
+
+          </div>
+
+          <!-- 底部按鈕區 -->
+          <div class="card-footer bg-white p-4 border-top-0">
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-success btn-lg">
+                確認儲存修改
+              </button>
+              <a href="/station/list" class="btn btn-link text-muted text-decoration-none">取消並回列表</a>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- 引入 Bootstrap JS (選用) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

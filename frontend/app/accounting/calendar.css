@@ -1,0 +1,187 @@
+/* react-day-picker 換上 Realicious 設計規範
+   白底 ｜ #E3E3E3 ｜ 主紅 #BB0015 ｜ 主黃 #FFD45C ｜ 純黑邊
+   在 BudgetCalendar.tsx 於 react-day-picker/style.css 之後 import，會蓋過預設 */
+
+.rdp-root {
+  margin: 0;
+  width: 100%;              /* 讓整個日曆吃滿容器，不再靠左縮成一團 */
+  --rdp-day-height: 40px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* 每一格（td）等寬撐開；按鈕填滿格子 */
+.rdp-day {
+  padding: 2px;
+  text-align: center;
+}
+.rdp-week .rdp-day,
+.rdp-weekdays .rdp-weekday {
+  width: calc(100% / 7);   /* 7 欄平均 */
+}
+
+/* 標題列：← 　月份　 → 三者同一行。
+   react-day-picker 的結構是 .rdp-month_caption 和 .rdp-nav 兩個「分開的」
+   元素。舊版讓 caption 絕對定位浮在 nav 上面，結果 nav 自己撐了一行、
+   月份浮在另一層 —— 看起來就變兩行。
+
+   改法：把 .rdp-month 設成 grid，讓 caption 和 nav「疊在同一個格子裡」
+   （grid-area 都指到 1/1），nav 用 space-between 把箭頭推到兩側，
+   caption 置中。三者共用同一行高，視覺上就在一起了。 */
+.rdp-month {
+  position: relative;
+  width: 100%;
+  display: grid;
+}
+.rdp-months {
+  width: 100%;
+  position: relative;
+}
+
+/* caption（月份）和 nav（箭頭）疊在同一個 grid 格子 */
+.rdp-month_caption,
+.rdp-nav {
+  grid-area: 1 / 1;
+  height: 36px;
+}
+
+.rdp-month_caption {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;    /* 點擊穿透，讓底下的箭頭可以按 */
+  font-weight: 900;
+  font-size: 15px;
+  margin: 0;
+}
+.rdp-nav {
+  display: flex;
+  justify-content: space-between;
+  pointer-events: auto;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.rdp-month_grid {
+  width: 100%;
+  margin-top: 16px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+.rdp-button_previous,
+.rdp-button_next {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #000;
+  background: #fff;
+  box-shadow: 0 4px 0 #000;
+  border-radius: 0;
+  transition: transform 0.08s;
+}
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background: #ffd45c;
+}
+.rdp-button_previous:active,
+.rdp-button_next:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+.rdp-chevron {
+  fill: #000;
+}
+
+.rdp-weekday {
+  color: #bb0015;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 4px;
+}
+
+.rdp-day_button {
+  width: 100%;
+  height: var(--rdp-day-height);
+  border-radius: 0;
+  border: 2px solid transparent;
+  font-weight: 700;
+  color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.rdp-day_button:hover {
+  border-color: #000;
+  background: #e3e3e3;
+}
+.rdp-outside .rdp-day_button {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: #bb0015;
+}
+
+.day-over .rdp-day_button,
+.rdp-day_button.day-over {
+  border-color: #bb0015;
+}
+
+.rdp-selected .rdp-day_button {
+  background: #ffd45c !important;
+  color: #000 !important;
+  border: 2px solid #000;
+}
+
+/* 有支出（紅點）/ 有收入（黑點）
+   ★ 支出用 ::after、收入用 ::before —— 兩個不同的偽元素，
+     所以同一天「又有支出又有收入」時，兩個點都畫得出來。
+     舊版兩個都用 ::after，後面的會蓋掉前面的，紅點被吃掉。 */
+.day-spend,
+.day-income {
+  position: relative;
+}
+.day-spend::after,
+.day-income::before {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border: 1px solid #000;
+  z-index: 1;
+}
+.day-spend::after {
+  background: #bb0015;
+}
+.day-income::before {
+  background: #000;
+}
+
+/* 兩種都有 → 左右並排，各讓開一半 */
+.day-spend.day-income::before {
+  transform: translateX(-9px);
+}
+.day-spend.day-income::after {
+  transform: translateX(1px);
+}
+
+/* 鍵盤 focus */
+.rdp-day_button:focus-visible {
+  outline: 4px solid #ffd45c;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rdp * {
+    transition: none !important;
+  }
+}

@@ -1,0 +1,109 @@
+<%- include('partials/hua_html_head.ejs') %>
+<%- include('partials/hua_html_navbar.ejs') %>
+<div class="container">
+  <!-- 分頁按鈕 -->
+<nav aria-label="Page navigation">
+  <ul class="pagination">
+    
+    <!-- 上一頁 -->
+    <li class="page-item <%= page <= 1 ? 'disabled' : '' %>">
+      <a class="page-link" href="/userManager/userList?page=<%= page - 1 %>">上一頁</a>
+    </li>
+
+    <!-- 顯示頁碼 (簡單版：列出所有頁碼) -->
+    <% for(let i = startPage; i <= endPage; i++) { %>
+      <li class="page-item <%= page === i ? 'active' : '' %>">
+        <a class="page-link" href="/userManager/userList?page=<%= i %>"><%= i %></a>
+      </li>
+    <% } %>
+
+    <!-- 下一頁 -->
+    <li class="page-item <%= page >= totalPages ? 'disabled' : '' %>">
+      <a class="page-link" href="/userManager/userList?page=<%= page + 1 %>">下一頁</a>
+    </li>
+    <li class="page-link" style="color:black;margin-right:1rem"><span>共 <%=totalPages %> 頁</span></li>
+    <div>
+      <input class="page-link" id="page" type="number" name="page" placeholder="輸入頁碼" style="display:inline;">
+      <button class="page-link" id="pageSwitch" type="submit" style="display:inline;">換頁</button>
+    </div>
+
+  </ul>
+</nav>
+</div>
+
+  <div class="container">
+    <div>
+      <a href="/userManager/userCreate" type="button" class="btn btn-outline-secondary">
+        <i class="fa-solid fa-plus"></i>新增會員</a>
+    </div>
+    <br>
+    <div>
+        <% if (message.length > 0) { %>
+          <div class="alert alert-primary">
+          <%= message %>
+          </div>  
+        <% } %>
+        <% if (error.length > 0) { %>
+          <div class="alert alert-danger">
+            <%= error %>
+          </div>  
+          <% } %>
+      </div>
+
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>account</th>
+          <th>姓名</th>
+          <th>使用者權限</th>
+          <th>帳戶狀態</th>
+          <th>建立時間</th>
+          <th>改動時間</th>
+          <th>修改</th>
+          <th>刪除</th>
+        </tr>
+      </thead>
+      <tbody>
+  
+        <% for(let i=0 ;i < users.length;i++){ %>
+        <%  const {id,account,password,role,status,created_at,updated_at,first_name,last_name}=users[i]; %>
+  
+        <tr>
+          <td><%= id %></td>
+          <td><%= account %></td>
+          <td><%= last_name %><%= first_name %></td>
+          <td><%= role %></td>
+          <td><%= status %></td>
+          <td><%= dayjs(created_at).format('YYYY/MM/DD HH:mm:ss') %></td>
+          <td><%= dayjs(updated_at).format('YYYY/MM/DD HH:mm:ss') %></td>
+          <!-- <td><%= updated_at %></td> -->
+          <td>
+            <a class="btn btn-light" href="/userManager/userUpdate/<%= id %>"><i class="fa-solid fa-pen"></i></a>
+            </td>
+          <td>
+            <form action="/userManager/userDelete" method="post" onsubmit="return confirm('您確定要刪除嗎')">
+              <input type="hidden" name="id" value="<%= id %>">
+              <button type="submit" class="btn btn-light" ><i class="fa-solid fa-trash-can"></i></button>
+            </form>
+            </td>
+        </tr>
+      <% } %>
+      </tbody>
+    </table>
+  </div>
+  <script>
+    //輸入換頁功能
+    const pageInput = document.getElementById('page')
+    const pagebtn = document.getElementById('pageSwitch')
+
+    pagebtn.addEventListener("click",()=>{
+      const newPage = pageInput.value
+      if(newPage){
+        window.location.href = `/userManager/userList?page=${newPage}`;
+      }else{next()}
+    })
+  
+  </script>
+  
+<%- include('partials/hua_html_end.ejs') %>

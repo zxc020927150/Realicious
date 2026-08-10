@@ -1,0 +1,121 @@
+    <div class="flex-1 overflow-y-auto p-8">
+        <h1 class="text-lg font-bold text-gray-700 mb-4">用戶記帳明細</h1>
+
+        <!-- 查詢表單 -->
+        <form action="accounting-detail" method="GET" class="bg-white p-6 rounded-lg shadow-sm border border-orange-100 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">用戶名稱</label>
+                    <input type="text" name="username" value="<%= username %>" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent" placeholder="輸入用戶名稱...">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">消費分類</label>
+                    <!-- 這裡可以根據你實際的分類項目調整 -->
+                    <select name="category" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <option value="" <%= category === '' ? 'selected' : '' %>>全部</option>
+                        <option value="早餐" <%= category === '早餐' ? 'selected' : '' %>>早餐</option>
+                        <option value="午餐" <%= category === '午餐' ? 'selected' : '' %>>午餐</option>
+                        <option value="晚餐" <%= category === '晚餐' ? 'selected' : '' %>>晚餐</option>
+                        <option value="宵夜" <%= category === '宵夜' ? 'selected' : '' %>>宵夜</option>
+                        <option value="飲料" <%= category === '飲料' ? 'selected' : '' %>>飲料</option>
+                        <option value="點心" <%= category === '點心' ? 'selected' : '' %>>點心</option>
+                        <option value="生活" <%= category === '生活' ? 'selected' : '' %>>生活</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+                    查詢
+                </button>
+                <a href="accounting-detail" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-md text-sm font-medium transition-colors inline-block text-center line-height-normal">
+                    清除
+                </a>
+            </div>
+        </form>
+
+        <!-- 結果表格 -->
+        <div class="bg-white rounded-lg shadow-sm border border-orange-100 flex flex-col">
+            <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-orange-50/50 rounded-t-lg">
+                <div class="text-sm text-gray-500">找到 <%= totalRows %> 筆明細結果</div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm text-gray-600">
+                    <thead class="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                        <tr>
+                            <th class="px-4 py-3">明細 ID</th>
+                            <th class="px-4 py-3">會員名稱</th>
+                            <th class="px-4 py-3">消費日期</th>
+                            <th class="px-4 py-3">分類</th>
+                            <th class="px-4 py-3">金額</th>
+                            <th class="px-4 py-3">備註</th>
+                            <th class="px-4 py-3">收據/照片</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% records.forEach(function(item) { %>
+                        <tr class="hover:bg-orange-50/50 transition-colors">
+                            <td class="px-4 py-3"><%= item.id %></td>
+                            <td class="px-4 py-3"><%= item.full_name || '未知用戶' %></td>
+                            <td class="px-4 py-3"><%= item.consume_date %></td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs"><%= item.category %></span>
+                            </td>
+                            <td class="px-4 py-3 font-semibold text-gray-700">$<%= item.amount %></td>
+                            <td class="px-4 py-3 text-gray-500"><%= item.user_remark || '無' %></td>
+                                <td class="px-4 py-3">
+                                    <% if (item.base64_src) { %>
+                                        <!-- 🌟 保留 group 來觸發 hover 效果 -->
+                                        <div class="group inline-block">
+                                            <!-- 縮圖 -->
+                                            <img src="<%= item.base64_src %>" alt="收據" class="w-12 h-12 object-cover rounded-md border border-gray-200 shadow-sm cursor-pointer hover:opacity-80 transition-all">
+                                            
+                                            <!-- 🌟 升級版放大預覽圖：改用 fixed 定位在螢幕正中央 -->
+                                            <!-- 加上 pointer-events-none 非常重要！避免滑鼠被大圖擋住導致畫面狂閃爍 -->
+                                            <div class="hidden group-hover:block fixed z-[9999] top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none bg-white p-3 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] border border-orange-200">
+                                            <img src="<%= item.base64_src %>" alt="圖片放大" class="w-[600px] max-w-[80vw] max-h-[80vh] object-contain rounded-lg">
+                                            </div>
+                                        </div>
+                                    <% } else { %>
+                                        <span class="text-gray-400 text-xs bg-gray-100 px-2 py-1 rounded-full">無檔案</span>
+                                    <% } %>
+                                </td>
+                        </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分頁區塊 -->
+            <div class="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+                <div>
+                    顯示第 <%= totalRows > 0 ? (page - 1) * perPage + 1 : 0 %> 至 
+                    <%= page * perPage > totalRows ? totalRows : page * perPage %> 項結果，
+                    共 <%= totalRows %> 項
+                </div>
+                <div class="flex gap-1">
+                    
+                    <!-- 上一頁：改用 category -->
+                    <a href="?username=<%= username %>&category=<%= category %>&page=<%= page > 1 ? page - 1 : 1 %>" 
+                    class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === 1 ? 'pointer-events-none opacity-50' : '' %>">
+                        上一頁
+                    </a>
+
+                    <!-- 頁碼按鈕：改用 category -->
+                    <% for(let i = 1; i <= totalPages; i++) { %>
+                        <a href="?username=<%= username %>&category=<%= category %>&page=<%= i %>" 
+                        class="px-3 py-1 rounded <%= page === i ? 'bg-orange-500 text-white' : 'border border-gray-200 hover:bg-gray-50 text-gray-700' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+
+                    <!-- 下一頁：改用 category -->
+                    <a href="?username=<%= username %>&category=<%= category %>&page=<%= page < totalPages ? page + 1 : totalPages %>" 
+                    class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === totalPages ? 'pointer-events-none opacity-50' : '' %>">
+                        下一頁
+                    </a>
+                    
+                </div>
+            </div>
+        </div>
+    </div>

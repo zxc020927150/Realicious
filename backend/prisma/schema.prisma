@@ -1,0 +1,631 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model announcement {
+  id            BigInt    @id @default(autoincrement())
+  title         String    @db.VarChar(100)
+  content       Json?
+  draft_content Json?
+  created_by    Int?
+  status        Int       @default(0) @db.TinyInt
+  is_pinned     Boolean   @default(false)
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+  updated_at    DateTime? @default(now()) @db.Timestamp(0)
+  users         users?    @relation(fields: [created_by], references: [id], onUpdate: NoAction, map: "announcement_ibfk_1")
+
+  @@index([created_by], map: "created_by")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model article {
+  id                   BigInt                 @id @default(autoincrement())
+  title                String                 @db.VarChar(32)
+  content              Json?
+  draft_content        Json?
+  user_id              Int?
+  status               Int                    @default(0) @db.TinyInt
+  is_pinned            Boolean                @default(false)
+  created_at           DateTime?              @default(now()) @db.Timestamp(0)
+  updated_at           DateTime?              @default(now()) @db.Timestamp(0)
+  users                users?                 @relation(fields: [user_id], references: [id], onUpdate: NoAction, map: "article_ibfk_1")
+  article_sub_category article_sub_category[]
+  comment              comment[]
+  saved_article        saved_article[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model article_sub_category {
+  article_id      BigInt
+  sub_category_id BigInt
+  article         article      @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "article_sub_category_ibfk_1")
+  sub_category    sub_category @relation(fields: [sub_category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "article_sub_category_ibfk_2")
+
+  @@id([article_id, sub_category_id])
+  @@index([sub_category_id], map: "sub_category_id")
+}
+
+model badge {
+  id               Int                @id @default(autoincrement())
+  badge_name       String             @db.VarChar(60)
+  badge_icon       String?            @db.VarChar(255)
+  badge_img        String?            @db.VarChar(255)
+  restaurant_badge restaurant_badge[]
+}
+
+model cart {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  product_id Int?
+  quantity   Int?      @default(1)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "cart_ibfk_2")
+
+  @@unique([user_id, product_id], map: "unique_user_product")
+  @@index([product_id], map: "product_id")
+}
+
+model categories {
+  id         Int        @id @default(autoincrement())
+  name       String?    @db.VarChar(50)
+  created_at DateTime?  @default(now()) @db.Timestamp(0)
+  updated_at DateTime?  @default(now()) @db.Timestamp(0)
+  products   products[]
+}
+
+model category {
+  id           BigInt         @id @default(autoincrement())
+  name         String         @db.VarChar(32)
+  created_at   DateTime?      @default(now()) @db.DateTime(0)
+  created_by   Int?
+  users        users?         @relation(fields: [created_by], references: [id], onUpdate: NoAction, map: "category_ibfk_1")
+  sub_category sub_category[]
+
+  @@index([created_by], map: "created_by")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model diet_detail {
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  type         String   @default("S") @db.Char(1)
+  consume_date DateTime @db.Date
+  category     String   @db.VarChar(20)
+  amount       Int
+  user_remark  String?  @db.VarChar(255)
+  create_time  DateTime @default(now()) @db.DateTime(0)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_diet_user")
+
+  @@index([user_id, consume_date], map: "idx_diet_user_date")
+}
+
+model favorites {
+  id         Int       @id @default(autoincrement())
+  user_id    Int?
+  product_id Int?
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "favorites_ibfk_2")
+
+  @@unique([user_id, product_id], map: "uk_user_product")
+  @@index([product_id], map: "favorites_ibfk_2")
+}
+
+model order_items {
+  id          Int      @id @default(autoincrement())
+  order_id    Int
+  product_id  Int
+  quantity    Int
+  unit_price  Int
+  item_status Int?     @default(1) @db.TinyInt
+  orders      orders   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "order_items_ibfk_1")
+  products    products @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "order_items_ibfk_2")
+
+  @@index([order_id], map: "fk_item_order")
+  @@index([product_id], map: "fk_item_product")
+}
+
+model orders {
+  id              Int           @id @default(autoincrement())
+  user_id         Int?
+  total_price     Int?
+  address         String?       @db.VarChar(255)
+  recipient_name  String?       @db.VarChar(100)
+  recipient_email String?       @db.VarChar(255)
+  recipient_phone String?       @db.VarChar(30)
+  status          Int?          @default(0) @db.TinyInt
+  paid_at         DateTime?     @db.Timestamp(0)
+  created_at      DateTime?     @default(now()) @db.Timestamp(0)
+  order_items     order_items[]
+  point_logs      point_logs[]
+}
+
+model permissions {
+  id               Int                @id @default(autoincrement())
+  perm_name        String             @unique(map: "perm_name") @db.VarChar(60)
+  description      String?            @db.VarChar(60)
+  role_permissions role_permissions[]
+}
+
+model point_logs {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  amount      Int?
+  point_after Int?
+  order_id    Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(0)
+  updated_at  DateTime? @default(now()) @db.Timestamp(0)
+  orders      orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "point_logs_ibfk_2")
+
+  @@index([order_id], map: "order_id")
+  @@index([user_id], map: "user_id")
+}
+
+model product_imgs {
+  id         Int       @id @default(autoincrement())
+  product_id Int?
+  url        String?   @db.VarChar(512)
+  alt_text   String?   @db.VarChar(255)
+  is_main    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_imgs_ibfk_1")
+
+  @@index([product_id], map: "fk_img_product")
+}
+
+model product_tags {
+  id         Int       @id @default(autoincrement())
+  tag_id     Int?
+  product_id Int?
+  tags       tags?     @relation(fields: [tag_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_tags_ibfk_1")
+  products   products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "product_tags_ibfk_2")
+
+  @@index([tag_id], map: "product_tags_ibfk_1")
+  @@index([product_id], map: "product_tags_ibfk_2")
+}
+
+model products {
+  id            Int            @id @default(autoincrement())
+  name          String         @db.VarChar(255)
+  stock_qty     Int?           @default(0)
+  price         Int
+  discount      Decimal?       @default(1.00) @db.Decimal(3, 2)
+  restaurant_id Int?           @default(1)
+  category_id   Int?
+  description   String?        @db.Text
+  is_active     Boolean?       @default(true)
+  created_at    DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at    DateTime?      @default(now()) @db.Timestamp(0)
+  cart          cart[]
+  favorites     favorites[]
+  order_items   order_items[]
+  product_imgs  product_imgs[]
+  product_tags  product_tags[]
+  categories    categories?    @relation(fields: [category_id], references: [id], onUpdate: NoAction, map: "products_ibfk_2")
+  stocks        stocks[]
+
+  @@index([category_id], map: "idx_category")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model restaurant {
+  id                 Int                @id @default(autoincrement())
+  name               String             @db.VarChar(100)
+  branch             String?            @db.VarChar(255)
+  desc_brief         String?            @db.VarChar(255)
+  county             String?            @db.VarChar(20)
+  district           String?            @db.VarChar(20)
+  address            String?            @db.VarChar(255)
+  telephone          String?            @db.VarChar(20)
+  is_poor_mode       String?            @db.Char(1)
+  average_range      Int?
+  logo_stop          String?            @db.VarChar(255)
+  cover_img          String?            @db.VarChar(255)
+  station_id         Int?
+  created_at         DateTime?          @default(now()) @db.Timestamp(0)
+  created_by_user_id Int?
+  station            station?           @relation(fields: [station_id], references: [id], onUpdate: NoAction, map: "fk_restaurant_station")
+  users              users?             @relation(fields: [created_by_user_id], references: [id], onUpdate: NoAction, map: "fk_restaurant_user")
+  restaurant_badge   restaurant_badge[]
+  vote               vote[]
+  work_hour          work_hour?
+
+  @@index([created_by_user_id], map: "fk_restaurant_user")
+  @@index([station_id], map: "fk_restaurant_station")
+}
+
+model restaurant_badge {
+  id            Int        @id @default(autoincrement())
+  badge_id      Int
+  user_id       Int
+  restaurant_id Int
+  season_id     Int
+  awarded_at    DateTime?  @default(now()) @db.Timestamp(0)
+  badge         badge      @relation(fields: [badge_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_badge_ibfk_1")
+  restaurant    restaurant @relation(fields: [restaurant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_badge_ibfk_2")
+  season        season     @relation(fields: [season_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "restaurant_badge_ibfk_3")
+
+  @@index([badge_id], map: "badge_id")
+  @@index([restaurant_id], map: "restaurant_id")
+  @@index([season_id], map: "season_id")
+}
+
+model role_permissions {
+  id          Int         @id @default(autoincrement())
+  role_id     Int
+  perm_id     Int
+  roles       roles       @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "role_permissions_ibfk_1")
+  permissions permissions @relation(fields: [perm_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_permissions_ibfk_2")
+
+  @@index([perm_id], map: "perm_id")
+  @@index([role_id], map: "role_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model roles {
+  id               Int                @id @default(autoincrement())
+  role_id          Int                @unique(map: "role_id")
+  role_name        String             @db.VarChar(60)
+  role_permissions role_permissions[]
+  users            users[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model season {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(60)
+  start_date         DateTime?            @default(now()) @db.Timestamp(0)
+  day                Int?
+  sub_categories_id  Int?
+  created_at         DateTime?            @default(now()) @db.Timestamp(0)
+  created_by_user_id Int?
+  restaurant_badge   restaurant_badge[]
+  season_tag_mapping season_tag_mapping[]
+  vote               vote[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model season_tag_mapping {
+  id            Int    @id @default(autoincrement())
+  season_id     Int
+  is_tag_active Int?   @default(1)
+  tag_id        Int
+  season        season @relation(fields: [season_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "season_tag_mapping_ibfk_1")
+
+  @@index([season_id], map: "season_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model station {
+  id           Int            @id @default(autoincrement())
+  name         String         @db.VarChar(60)
+  restaurant   restaurant[]
+  station_line station_line[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model station_line {
+  id         Int     @id @default(autoincrement())
+  station_id Int
+  code       String  @unique(map: "code_UNIQUE") @db.VarChar(60)
+  type_id    Int?
+  station    station @relation(fields: [station_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "station_line_ibfk_1")
+
+  @@unique([type_id, station_id], map: "idx_station_type_unique")
+  @@index([station_id], map: "station_line_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model station_line_string {
+  id                       Int    @id @default(autoincrement())
+  station_line_type_id     Int
+  station_line_type_string String @db.VarChar(60)
+}
+
+model stocks {
+  id            Int       @id @default(autoincrement())
+  restaurant_id Int?
+  product_id    Int?
+  stock_in_qty  Int?
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+  updated_at    DateTime? @default(now()) @db.Timestamp(0)
+  products      products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "stocks_ibfk_2")
+
+  @@index([product_id], map: "stocks_ibfk_2")
+}
+
+model sub_category {
+  id                   BigInt                 @id @default(autoincrement())
+  name                 String                 @db.VarChar(32)
+  parent_id            BigInt
+  created_at           DateTime?              @default(now()) @db.DateTime(0)
+  created_by           Int?
+  article_sub_category article_sub_category[]
+  category             category               @relation(fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "sub_category_ibfk_1")
+  users                users?                 @relation(fields: [created_by], references: [id], onUpdate: NoAction, map: "sub_category_ibfk_2")
+
+  @@index([created_by], map: "created_by")
+  @@index([parent_id], map: "parent_id")
+}
+
+model tags {
+  id           Int            @id @default(autoincrement())
+  area         String?        @db.VarChar(50)
+  created_at   DateTime?      @default(now()) @db.Timestamp(0)
+  updated_at   DateTime?      @default(now()) @db.Timestamp(0)
+  product_tags product_tags[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model upload_file {
+  id          Int      @id @default(autoincrement())
+  file_name   String   @db.VarChar(255)
+  file_path   String   @db.VarChar(255)
+  file_desc   String?  @db.VarChar(255)
+  create_time DateTime @default(now()) @db.DateTime(0)
+  update_time DateTime @default(now()) @db.DateTime(0)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_budget {
+  id                   Int      @id @default(autoincrement())
+  user_id              Int      @unique(map: "uk_user_budget_user")
+  daily_budget         Int      @default(500)
+  is_poor_mode_enabled String   @default("N") @db.Char(1)
+  create_time          DateTime @default(now()) @db.DateTime(0)
+  update_time          DateTime @default(now()) @db.DateTime(0)
+  users                users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_budget_user")
+}
+
+model user_profile {
+  id         Int       @id @default(autoincrement())
+  profile_id Int       @unique(map: "profile_id")
+  first_name String?   @db.VarChar(60)
+  last_name  String?   @db.VarChar(60)
+  nick_name  String?   @db.VarChar(60)
+  city       String?   @db.VarChar(20)
+  district   String?   @db.VarChar(60)
+  address    String?   @db.VarChar(255)
+  phone      String?   @db.VarChar(20)
+  birthday   DateTime? @db.Date
+  avatar     String?   @db.VarChar(255)
+  updated_at DateTime? @default(now()) @db.DateTime(0)
+  users      users     @relation(fields: [profile_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_profile_ibfk_1")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id                  Int                    @id @default(autoincrement())
+  account             String                 @unique(map: "account") @db.VarChar(60)
+  password            String?                @db.VarChar(255)
+  role                Int                    @default(11)
+  status              Int                    @default(1)
+  created_at          DateTime?              @default(now()) @db.DateTime(0)
+  updated_at          DateTime?              @default(now()) @db.DateTime(0)
+  google_id           String?                @unique(map: "google_id") @db.VarChar(255)
+  messages            ChatMessage[]
+  createdRooms        ChatRoom[]             @relation("RoomCreator")
+  favoritedRooms      FavoriteRoom[]
+  receivedInvitations FriendshipInvitation[] @relation("ReceivedInvitations")
+  sentInvitations     FriendshipInvitation[] @relation("SentInvitations")
+  messageReads        MessageRead[]
+  roomMemberships     RoomMember[]
+  announcement        announcement[]
+  article             article[]
+  category            category[]
+  comment             comment[]
+  diet_detail         diet_detail[]
+  restaurant          restaurant[]
+  saved_article       saved_article[]
+  sub_category        sub_category[]
+  user_budget         user_budget?
+  user_pet            user_pet?
+  user_profile        user_profile?
+  roles               roles                  @relation(fields: [role], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "users_ibfk_1")
+
+  @@index([account], map: "account_2")
+  @@index([role], map: "role")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model vote {
+  id            Int        @id @default(autoincrement())
+  season_id     Int
+  user_id       Int
+  restaurant_id Int
+  voted_at      DateTime?  @default(now()) @db.Timestamp(0)
+  season        season     @relation(fields: [season_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vote_ibfk_1")
+  restaurant    restaurant @relation(fields: [restaurant_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "vote_ibfk_2")
+
+  @@index([restaurant_id], map: "restaurant_id")
+  @@index([season_id], map: "season_id")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model work_hour {
+  id         Int        @id
+  mon        String?    @db.VarChar(50)
+  tue        String?    @db.VarChar(50)
+  wed        String?    @db.VarChar(50)
+  thu        String?    @db.VarChar(50)
+  fri        String?    @db.VarChar(50)
+  sat        String?    @db.VarChar(50)
+  sun        String?    @db.VarChar(50)
+  holiday    String?    @db.VarChar(50)
+  restaurant restaurant @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_work_hour_restaurant")
+}
+
+model EmailVerification {
+  id         Int      @id @default(autoincrement())
+  email      String   @db.VarChar(255)
+  code       String   @db.VarChar(6)
+  expireAt   DateTime
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  resetToken String?
+
+  @@index([email])
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_pet {
+  id            Int      @id @default(autoincrement())
+  user_id       Int      @unique(map: "uk_user_pet_user")
+  pet_name      String   @default("小雞") @db.VarChar(20)
+  equipped_head String?  @db.VarChar(20)
+  equipped_neck String?  @db.VarChar(20)
+  create_time   DateTime @default(now()) @db.DateTime(0)
+  update_time   DateTime @default(now()) @db.DateTime(0)
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_pet_user")
+}
+
+model saved_article {
+  user_id          Int
+  saved_article_id BigInt
+  created_at       DateTime? @default(now()) @db.Timestamp(0)
+  users            users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "saved_article_ibfk_1")
+  article          article   @relation(fields: [saved_article_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "saved_article_ibfk_2")
+
+  @@id([user_id, saved_article_id])
+  @@index([saved_article_id], map: "saved_article_id")
+}
+
+model comment {
+  id            BigInt    @id @default(autoincrement())
+  article_id    BigInt
+  user_id       Int
+  content       String    @db.Text
+  parent_id     BigInt?
+  created_at    DateTime? @default(now()) @db.Timestamp(0)
+  updated_at    DateTime? @default(now()) @db.Timestamp(0)
+  article       article   @relation(fields: [article_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comment_article")
+  comment       comment?  @relation("commentTocomment", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comment_parent")
+  other_comment comment[] @relation("commentTocomment")
+  users         users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_comment_user")
+
+  @@index([article_id], map: "idx_comment_article")
+  @@index([parent_id], map: "idx_comment_parent")
+  @@index([user_id], map: "idx_comment_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model user_tickets {
+  id             Int       @id @default(autoincrement())
+  user_id        Int
+  product_id     Int?
+  order_id       Int?
+  redeem_code    String?   @db.VarChar(36)
+  name           String    @db.VarChar(255)
+  type           String?   @default("product") @db.VarChar(20)
+  status         Int?      @default(1) @db.TinyInt
+  discount_value Int?      @default(0)
+  min_purchase   Int?      @default(0)
+  used_at        DateTime? @db.Timestamp(0)
+  expires_at     DateTime? @db.Timestamp(0)
+  created_at     DateTime? @default(now()) @db.Timestamp(0)
+
+  @@index([user_id], map: "idx_user")
+}
+
+model ChatRoom {
+  id           Int            @id @default(autoincrement())
+  name         String?        @db.VarChar(100)
+  type         RoomType       @default(DIRECT)
+  passwordHash String?        @db.VarChar(255)
+  createdBy    Int?
+  createdAt    DateTime       @default(now())
+  imageUrl     String?        @db.VarChar(500)
+  messages     ChatMessage[]
+  creator      users?         @relation("RoomCreator", fields: [createdBy], references: [id])
+  favorites    FavoriteRoom[]
+  members      RoomMember[]
+
+  @@index([createdBy], map: "ChatRoom_createdBy_fkey")
+}
+
+model RoomMember {
+  id       Int      @id @default(autoincrement())
+  roomId   Int
+  userId   Int
+  role     RoomRole @default(MEMBER)
+  joinedAt DateTime @default(now())
+  room     ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user     users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, userId])
+  @@index([userId], map: "RoomMember_userId_fkey")
+}
+
+model FriendshipInvitation {
+  id         Int              @id @default(autoincrement())
+  senderId   Int
+  receiverId Int
+  status     InvitationStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+  receiver   users            @relation("ReceivedInvitations", fields: [receiverId], references: [id], onDelete: Cascade)
+  sender     users            @relation("SentInvitations", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId], map: "FriendshipInvitation_receiverId_fkey")
+}
+
+model ChatMessage {
+  id        Int           @id @default(autoincrement())
+  roomId    Int
+  senderId  Int
+  content   String        @db.Text
+  createdAt DateTime      @default(now())
+  room      ChatRoom      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender    users         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  reads     MessageRead[]
+
+  @@index([roomId], map: "ChatMessage_roomId_fkey")
+  @@index([senderId], map: "ChatMessage_senderId_fkey")
+}
+
+model MessageRead {
+  messageId Int
+  userId    Int
+  readAt    DateTime    @default(now())
+  message   ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      users       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([messageId, userId])
+  @@index([userId], map: "MessageRead_userId_fkey")
+}
+
+model FavoriteRoom {
+  userId    Int
+  roomId    Int
+  createdAt DateTime @default(now())
+  room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user      users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roomId])
+  @@index([roomId], map: "FavoriteRoom_roomId_fkey")
+}
+
+enum RoomType {
+  DIRECT
+  PUBLIC_GROUP
+  PRIVATE_GROUP
+}
+
+enum RoomRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}

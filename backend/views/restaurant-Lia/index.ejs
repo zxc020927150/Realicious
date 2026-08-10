@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食後台管理系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #fdba74; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f97316; }
+    </style>
+</head>
+<body class="bg-orange-50 text-gray-800 font-sans flex h-screen overflow-hidden">
+
+    <!-- 🧩 裝上左邊區塊的零件 -->
+    <%- include('../restaurant-Lia/html-sidebar') %>
+
+    <main class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- 🧩 裝上上面區塊的零件 -->
+        <%- include('../restaurant-Lia/html-navbar') %>
+
+
+
+        <!-- 🧩 根據後端傳來的 pageName，動態決定要裝哪一個 body 零件 -->
+                <% if (pageName === 'list') { %>
+                    <%- include('../restaurant-Lia/html-body-list') %>
+                <% } else if (pageName === 'add') { %>
+                    <%- include('../restaurant-Lia/html-body-add') %>
+                <% } else if (pageName === 'edit') { %>
+                    <!-- 🌟 這裡是編輯頁面的身體 -->
+                    <%- include('../restaurant-Lia/html-body-edit') %>
+                <% } else { %>
+                    <!-- 防呆機制：萬一沒傳，預設就顯示列表 -->
+                    <%- include('../restaurant-Lia/html-body-list') %>
+                <% } %>
+    </main>
+
+</body>
+</html>

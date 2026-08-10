@@ -1,0 +1,455 @@
+/* ============================================================
+   Realicious — 動效與材質
+
+   一條規則貫穿全部：像素的東西不做平滑補間。
+   所有位移都用 steps()，一格一格跳。Tailwind 的 animate-bounce
+   是 cubic-bezier，掛在像素角色上就穿幫了。
+   ============================================================ */
+
+/* ---------- 抖色（dithering）----------
+   像素遊戲沒有漸層，它用 2×2 棋盤格混兩個顏色來假裝。
+   --dither-a 疊在 --dither-b 上。
+   dither-sparse 是比較稀的網點，用來做「漸層帶」的中段。 */
+.dither {
+  background-color: var(--dither-b, #fff);
+  background-image:
+    linear-gradient(
+      45deg,
+      var(--dither-a, #000) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--dither-a, #000) 75%
+    ),
+    linear-gradient(
+      45deg,
+      var(--dither-a, #000) 25%,
+      transparent 25%,
+      transparent 75%,
+      var(--dither-a, #000) 75%
+    );
+  background-size: 4px 4px;
+  background-position:
+    0 0,
+    2px 2px;
+}
+.dither-sparse {
+  background-size: 8px 8px;
+  background-position:
+    0 0,
+    4px 4px;
+}
+
+/* ---------- 掃描線 + 顆粒 ----------
+  純白底不是「乾淨」，是「空的」。加一層極淡的 CRT 掃描線，
+   畫面立刻有材質。3% 就好，看得出來就太多了。 */
+.crt-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.028) 0px,
+    rgba(0, 0, 0, 0.028) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ---------- 小雞待機：2 格呼吸 ---------- */
+.pixel-bob {
+  animation: pixel-bob 1.1s steps(1, end) infinite;
+}
+@keyframes pixel-bob {
+  0%,
+  49% {
+    transform: translateY(0);
+  }
+  50%,
+  100% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ---------- 開心：跳一下（4 格）---------- */
+.happy-hop {
+  animation: happy-hop 0.42s steps(1, end) 3;
+}
+@keyframes happy-hop {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-12px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+  75% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* ---------- 吃土：垂頭喪氣，動很小、很慢 ---------- */
+.junk-slump {
+  animation: junk-slump 2.6s steps(1, end) infinite;
+}
+@keyframes junk-slump {
+  0%,
+  59% {
+    transform: translateY(2px);
+  }
+  60%,
+  100% {
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- 幽靈：飄。6 格上下 + 一點左右 ---------- */
+.ghost-float {
+  animation: ghost-float 3.2s steps(1, end) infinite;
+  opacity: 0.75;
+}
+@keyframes ghost-float {
+  0% {
+    transform: translate(0, -6px);
+  }
+  16% {
+    transform: translate(2px, -10px);
+  }
+  33% {
+    transform: translate(3px, -14px);
+  }
+  50% {
+    transform: translate(0, -12px);
+  }
+  66% {
+    transform: translate(-3px, -14px);
+  }
+  83% {
+    transform: translate(-2px, -10px);
+  }
+  100% {
+    transform: translate(0, -6px);
+  }
+}
+
+/* ---------- 餓了：頭上的驚嘆號一閃一閃 ---------- */
+.hunger-blip {
+  animation: hunger-blip 0.9s steps(1, end) infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 65%, 0 65%, 0 78%, 100% 78%, 100% 100%, 0 100%);
+}
+@keyframes hunger-blip {
+  0%,
+  59% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  60%,
+  100% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------- 開心的星星 ---------- */
+.spark {
+  animation: spark 0.7s steps(1, end) 3;
+  opacity: 0;
+}
+.spark-1 {
+  top: 10px;
+  left: -14px;
+  animation-delay: 0.05s;
+}
+.spark-2 {
+  top: 0;
+  right: -12px;
+  animation-delay: 0.18s;
+}
+.spark-3 {
+  top: 34px;
+  right: -18px;
+  animation-delay: 0.3s;
+}
+@keyframes spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.4) translateY(-6px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) translateY(-14px);
+  }
+}
+
+/* ---------- 吃土的塵埃 ---------- */
+.dust-mote {
+  animation: dust-mote 2.4s steps(6, end) infinite;
+  opacity: 0;
+}
+@keyframes dust-mote {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-46px) translateX(10px);
+  }
+}
+
+/* ---------- 雲：steps() 讓它一格一格漂 ---------- */
+.pixel-cloud {
+  left: -90px;
+  animation-name: cloud-drift;
+  animation-timing-function: steps(56, end);
+  animation-iteration-count: infinite;
+}
+@keyframes cloud-drift {
+  from {
+    left: -90px;
+  }
+  to {
+    left: 105%;
+  }
+}
+
+/* ---------- HP 低：紅色警示掃描 ---------- */
+.danger-scan {
+  background: linear-gradient(
+    to bottom,
+    rgba(187, 0, 21, 0) 0%,
+    rgba(187, 0, 21, 0.16) 50%,
+    rgba(187, 0, 21, 0) 100%
+  );
+  background-size: 100% 60px;
+  background-repeat: no-repeat;
+  animation: danger-scan 2.2s steps(12, end) infinite;
+}
+@keyframes danger-scan {
+  from {
+    background-position: 0 -60px;
+  }
+  to {
+    background-position: 0 220px;
+  }
+}
+
+/* ---------- 超支：整張卡震一下 ---------- */
+.shake-once {
+  animation: shake-once 0.36s steps(1, end) 1;
+}
+@keyframes shake-once {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  12% {
+    transform: translateX(-5px);
+  }
+  25% {
+    transform: translateX(5px);
+  }
+  37% {
+    transform: translateX(-4px);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+  62% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+/* ---------- 明細列：一列一列彈進來 ---------- */
+.row-in {
+  animation: row-in 0.26s steps(3, end) both;
+}
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ---------- 進度條：寬度變化要有時間感，別瞬移 ---------- */
+.bar-fill {
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================================
+   層次：目前每張卡都是 3px 邊 + 4px 陰影 —— 全部一樣大聲 = 沒有主角。
+   分成三階：
+   ============================================================ */
+
+/* 主角（小雞舞台的外框）：雙層邊，最重 */
+.card-hero {
+  border: 4px solid #000;
+  box-shadow:
+    0 6px 0 #000,
+    8px 14px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* 一般卡：維持原本的規格 */
+.card-base {
+  border: 3px solid #000;
+  box-shadow: 0 4px 0 #000;
+}
+
+/* 配角（明細列、legend）：細邊、不投影 */
+.card-quiet {
+  border: 2px solid #000;
+  box-shadow: none;
+}
+
+/* 按鈕手感：hover 先浮起來，active 再壓下去 —— 有「按到」的物理感 */
+.btn-chunky {
+  transition:
+    transform 0.08s steps(2, end),
+    box-shadow 0.08s steps(2, end),
+    background-color 0.12s;
+}
+.btn-chunky:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #000;
+}
+.btn-chunky:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
+/* ---------- 尊重使用者設定 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pixel-bob,
+  .happy-hop,
+  .junk-slump,
+  .ghost-float,
+  .hunger-blip,
+  .spark,
+  .dust-mote,
+  .pixel-cloud,
+  .danger-scan,
+  .shake-once,
+  .row-in,
+  .btn-chunky {
+    animation: none !important;
+    transition: none !important;
+  }
+  .crt-lines {
+    display: none;
+  }
+  .sky-shift {
+    transition: none !important;
+  }
+}
+
+/* ---------- 天空換色：小雞死掉的時候，天不該「啪」一下就黑 ---------- */
+.sky-shift {
+  transition: background-color 0.8s ease;
+}
+.sky-shift.dither {
+  transition:
+    background-color 0.8s ease,
+    background-image 0.8s ease;
+}
+
+/* ---------- sprite sheet 播放 ---------- */
+@keyframes sprite-run {
+  to {
+    background-position-x: var(--sprite-end);
+  }
+}
+
+/* ---------- 頂部橫幅通知：從畫面上方滑下來 ----------
+   steps() 讓它一格一格掉，維持像素感（不是平滑補間）。
+   ★ 只做上下位移（translateY），不碰 X —— 水平置中交給 inset-x-0 + mx-auto。
+     （舊版用 translate(-50%, …) 是搭配 left-1/2 置中，但那會被捲軸寬度影響而歪掉。） */
+.toast-drop {
+  animation: toast-drop 0.32s steps(6, end) both;
+}
+@keyframes toast-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast-drop {
+    animation: none;
+  }
+}
+
+/* ---------- 燈箱彈出：從小放大 + 淡入 ----------
+   steps() 維持像素感。 */
+.lightbox-pop {
+  animation: lightbox-pop 0.22s steps(4, end) both;
+}
+@keyframes lightbox-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-pop {
+    animation: none;
+  }
+}
+
+/* ---------- 戳一下的台詞泡泡:pop 進場 ----------
+   steps() 維持像素感。動畫掛在「內層」,不會跟外層的定位 transform 打架。 */
+.talk-pop {
+  animation: talk-pop 0.18s steps(3, end) both;
+}
+@keyframes talk-pop {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .talk-pop { animation: none; }
+}
+
+/* ---------- 教學聚光燈:環呼吸 + 外圈虛線瞄準 ---------- */
+.tut-pulse {
+  animation: tut-pulse 1.1s steps(2, end) infinite;
+}
+@keyframes tut-pulse {
+  0%, 49%  { transform: scale(1); }
+  50%,100% { transform: scale(1.06); }
+}
+.tut-spin {
+  animation: tut-spin 4s steps(8, end) infinite;
+}
+@keyframes tut-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-pulse, .tut-spin { animation: none; }
+}

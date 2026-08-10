@@ -1,0 +1,473 @@
+<%- include('../../partials/articles/html-head.ejs') %> <%-
+include('../../partials/articles/html-navbar.ejs') %>
+
+<style>
+
+button, div > input{
+    border-radius: 5px;
+}
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+}
+
+dialog form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* 增加表單欄位間距 */
+    padding: 10px;
+}
+
+dialog .btn-group {
+    margin-top: 10px;
+}
+
+</style>
+
+<!-- 新增 -->
+<div>
+<dialog id="dialog">
+	<form action="" id="addCategory">
+		<h3>新增類別</h3>
+		<label for="name" class="name">類別名稱：</label>
+		<input type="text" name="name" id="name" required>
+        <br>
+		<div class="btn-group">
+		<div class="submit"><input type="submit" value="送出"></div>
+		<div><button type="button" id="closeBtn">取消</button></div>
+		</div>
+	</form>
+</dialog>
+
+<dialog id="sub_dialog">
+	<form action="" id="add_sub_category">
+		<h3>新增子類別</h3>
+		<label for="sub_name" class="sub_name">子類別名稱：</label>
+		<input type="text" name="sub_name" id="sub_name" required>
+		<label for="parent_list" class="parent">關聯類別：</label>
+		<select name="parent" id="parent_list" class="form_select">
+		<option value="" selected disabled>請選擇關聯類別</option>
+		<% if (locals.dropdownlist && dropdownlist.length > 0) { %>
+        <% for (let item of dropdownlist) { %>
+            <option value="<%= item.id %>"><%= item.name %></option>
+        <% } %>
+    	<% } else { %>
+        <option disabled>暫無類別資料</option>
+    	<% } %>
+		</select>        
+		<br>
+		<div class="btn-group">
+		<div class="sub_submit"><input type="submit" value="送出"></div>
+		<div><button type="button" id="sub_close_btn">取消</button></div>
+		</div>
+	</form>
+</dialog>
+
+<!-- 編輯 -->
+<dialog id="edit_dialog">
+	<form action="" id="editCategoryForm">
+		<h3>編輯類別</h3>
+		<input type="hidden" id="edit_category_id">
+		<label for="edit_category_name">類別名稱：</label>
+		<input type="text" id="edit_category_name">
+        <br>
+		<div class="btn-group">
+		<div class="submit"><input type="submit" value="送出修改">
+		<button type="button" id="edit_close_btn">取消</button></div>
+		</div>
+	</form>
+</dialog>
+
+<dialog id="edit_sub_dialog">
+	<form action="" id="editSubCategoryForm">
+		<h3>編輯子類別</h3>
+		<input type="hidden" id="edit_sub_id">
+		<label for="edit_sub_name">子類別名稱：</label>
+		<input type="text" id="edit_sub_name" required>
+		<br>
+		<label for="edit_sub_parent_list">關聯類別：</label>
+		<select id="edit_sub_parent_list" class="form_select" required>
+			<% for (let item of dropdownlist) { %>
+				<option value="<%= item.id %>"><%= item.name %></option>
+			<% } %>
+		</select>
+        <br>
+		<div class="btn-group">
+			<input type="submit" value="送出修改">
+			<button type="button" id="edit_sub_close_btn">取消</button>
+		</div>
+	</form>
+</dialog>
+<!-- dialog end -->
+
+<div class="container mt-3">
+	<h2>類別列表</h2>
+    <!-- <div class="row">
+		<div class="col">
+			<nav aria-label="Page navigation example"></nav>
+		</div>
+    </div> -->
+
+	<div class="categories-btn my-3">
+		<button class="btn btn-success" id="open">新增類別</button
+	></div>
+
+	<div class="row">
+		<div class="col">
+            <table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>類別名稱</th>
+						<th>建立者</th>
+						<th>帳號</th>
+                        <th>建立時間</th>
+						<th>編輯</th>
+						<th>刪除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% for (let c of categories){ %>
+					<tr>
+						<td><%= c.id %></td>
+						<td><%= c.name %></td>
+						<td><%= c.created_by %></td>
+						<td><%= c.account %></td>
+                        <td><%= c.created_at %></td>
+						<td><i class="fa-solid fa-pen-to-square edit-category-btn" 
+							data-id="<%= c.id %>"
+							data-name="<%= c.name %>">
+							</i>
+						</td>
+						<td><i class="fa-solid fa-trash-can delete-category-btn" data-id="<%= c.id %>" data-name="<%= c.name %>"></i></td>
+
+					</tr>
+                    <% } %>
+				</tbody>
+            </table>
+		</div>
+	</div>
+
+
+
+
+<!-- 子類別 -->
+
+	<div class="categories-btn mb-3 ">
+		<button class="btn btn-success" id="sub_open">新增子類別</button>
+	</div>
+
+	<div class="row">
+		<div class="col">
+            <table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>子類別名稱</th>
+						<th>關聯類別名稱</th>
+						<th>建立者</th>
+						<th>帳號</th>
+                        <th>建立時間</th>
+						<th>編輯</th>
+						<th>刪除</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% for (let sc of sub_categories){ %>
+					<tr>
+						<td><%= sc.id %></td>
+						<td><%= sc.name %></td>
+						<td><%= sc.parent_name %></td>
+						<td><%= sc.created_by %></td>
+						<td><%= sc.account %></td>
+                        <td><%= sc.created_at %></td>
+						<td>
+							<i class="fa-solid fa-pen-to-square edit-sub-category-btn" data-id="<%= sc.id %>" data-name="<%= sc.name %>" data-parent="<%= sc.parent_id %>"></i>
+						</td>
+						<td><i class="fa-solid fa-trash-can delete-sub-category-btn" data-id="<%= sc.id %>" data-name="<%= sc.name %>"></i></td>
+					</tr>
+                    <% } %>
+				</tbody>
+            </table>
+		</div>
+	</div>
+</div>
+
+<script>
+	const dialog = document.getElementById("dialog");
+    const openBtn = document.getElementById("open");
+	const addForm = document.getElementById("addCategory");
+	const nameInput = document.getElementById("name");
+	const closeBtn = document.getElementById("closeBtn");
+
+
+	if (openBtn) {
+        openBtn.addEventListener("click", () => {
+            dialog.showModal(); // 顯示對話框
+        });
+    }
+
+	if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            dialog.close(); // 關閉對話框
+        });
+    }
+
+	addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+	const created_by = 1;
+	const content = {
+		name: nameInput.value,
+		created_by: created_by
+	};
+try {
+	const res = await fetch(`/articles/category/add`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify(content)
+	});
+
+	const data = await res.json();
+
+	if (data.success) {
+            alert(data.message);
+            location.reload(); // 成功後重新整理看結果
+        } else {
+            alert("失敗：" + data.message);
+        }
+    } catch (error) {
+        console.error("發生錯誤:", error);
+        alert("連線發生問題");
+    }
+});
+
+	const SubDialog = document.getElementById("sub_dialog");
+    const SubOpenBtn = document.getElementById("sub_open");
+	const AddSubForm = document.getElementById("add_sub_category");
+	const SubNameInput = document.getElementById("sub_name");
+	const SubCloseBtn = document.getElementById("sub_close_btn");
+	const ParentInput = document.getElementById("parent_list");
+
+	if (SubOpenBtn) {
+        SubOpenBtn.addEventListener("click", () => {
+            SubDialog.showModal(); // 顯示對話框
+        });
+    }
+
+	if (SubCloseBtn) {
+        SubCloseBtn.addEventListener("click", () => {
+            SubDialog.close(); // 關閉對話框
+        });
+    }
+
+	AddSubForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+	const content = {
+		name: SubNameInput.value,
+		parent_id: ParentInput.value,
+		created_by: 1
+	};
+
+try {
+	const res = await fetch(`/articles/category/add/sub`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify(content)
+	});
+
+	const data = await res.json();
+
+	if (data.success) {
+            alert(data.message);
+            location.reload(); // 成功後重新整理看結果
+        } else {
+            alert("子類別新增失敗：" + data.message);
+        }
+    } catch (error) {
+        console.error("發生錯誤:", error);
+        alert("連線發生問題");
+    }
+});
+</script>
+
+<script>
+const editDialog = document.getElementById("edit_dialog");
+const editIdInput = document.getElementById("edit_category_id");
+const editNameInput = document.getElementById("edit_category_name");
+const editCloseBtn = document.getElementById("edit_close_btn");
+
+//編輯btn
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("edit-category-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const name = e.target.getAttribute("data-name");
+
+        //顯示目前的類別名稱
+        if (editIdInput && editNameInput) {
+            editIdInput.value = id;
+            editNameInput.value = name;
+            editDialog.showModal();
+        }
+    }
+});
+
+if (editCloseBtn) {
+    editCloseBtn.addEventListener("click", () => {
+        editDialog.close();
+    });
+}
+
+//處理編輯送出
+const editForm = document.getElementById("editCategoryForm");
+if (editForm) {
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = editIdInput.value;
+        const updatedData = {
+            name: editNameInput.value
+        };
+
+        try {
+            const res = await fetch(`/articles/category/edit/${id}`, {
+                method: "PUT", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData)
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("修改成功！");
+                location.reload(); 
+            } else {
+                alert("修改失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("錯誤:", error);
+            alert("連線發生問題");
+        }
+    });
+}
+</script>
+
+<script>
+const editSubDialog = document.getElementById("edit_sub_dialog");
+const editSubIdInput = document.getElementById("edit_sub_id");
+const editSubNameInput = document.getElementById("edit_sub_name");
+const editSubParentInput = document.getElementById("edit_sub_parent_list");
+const editSUbCloseBtn = document.getElementById("edit_sub_close_btn");
+
+//編輯btn
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("edit-sub-category-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const name = e.target.getAttribute("data-name");
+        const parentId = e.target.getAttribute("data-parent");
+
+		if(editSubIdInput && editSubNameInput && editSubParentInput){
+		editSubIdInput.value=id;
+		editSubNameInput.value=name;
+		editSubParentInput.value=parentId;
+
+        editSubDialog.showModal();
+    	}
+	}
+});
+
+//處理編輯送出
+const editSubForm = document.getElementById("editSubCategoryForm");
+if (editSubForm) {
+    editSubForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = editSubIdInput.value;
+        const body = {
+            name: editSubNameInput.value,
+			parent_id: editSubParentInput.value
+        };
+
+        try {
+            const res = await fetch(`/articles/category/edit/sub/${id}`, {
+                method: "PUT", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("子類別修改成功！");
+                location.reload(); 
+            } else {
+                alert("子類別修改失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("錯誤:", error);
+            alert("連線發生問題");
+        }
+    });
+}
+
+editSUbCloseBtn.onclick = () => editSubDialog.close();
+
+// 刪除
+// 刪除類別
+document.addEventListener("click", async function (e) {
+    if (e.target.classList.contains("delete-category-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const name = e.target.getAttribute("data-name");
+
+        if (confirm(`確定要刪除類別「${name}」嗎？\n注意：會一併刪除關聯的子類別！`)) {
+            try {
+                const res = await fetch(`/articles/category/delete`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert("刪除失敗：" + data.message);
+                }
+            } catch (error) {
+                console.error("錯誤:", error);
+                alert("連線發生問題");
+            }
+        }
+    }
+
+// 刪除子類別
+    if (e.target.classList.contains("delete-sub-category-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const name = e.target.getAttribute("data-name");
+
+        if (confirm(`確定要刪除子類別「${name}」嗎？`)) {
+            try {
+                const res = await fetch(`/articles/category/delete/sub`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ id })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert("刪除失敗：" + data.message);
+                }
+            } catch (error) {
+                console.error("錯誤:", error);
+                alert("連線發生問題");
+            }
+        }
+    }
+});
+</script>
+
+<%- include('../../partials/articles/html-scripts.ejs') %>
+<%- include('../../partials/articles/html-tail.ejs') %>

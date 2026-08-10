@@ -1,0 +1,299 @@
+<%- include('../../partials/articles/html-head.ejs') %> <%-
+include('../../partials/articles/html-navbar.ejs') %>
+<style>
+button, div > input  {
+	border-radius: 5px;
+}
+
+dialog {
+  min-width: 400px;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#addForm {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center;   */
+  align-items: flex-start;
+  width: 100%;
+  gap: 10px; 
+}
+
+.btn-group {
+  display: flex;
+  justify-content: flex-start; /* 確保內容從左側開始排列 */
+  width: 100%;                 /* 讓容器撐滿父層寬度，對齊才有意義 */
+  gap: 10px;                   /* 設定按鈕之間的間距 */
+  margin-top: 15px;            /* 與上方輸入框保持距離 */
+}
+
+.btn-group > div {
+  display: inline-block;
+}
+
+.open-btn {
+    margin: 20px 0 20px 0;
+
+}
+</style>
+
+<dialog id="dialog">
+    <form id="addForm">
+        <h3>新增公告</h3>
+        <label for="title">公告標題：</label>
+        <input type="text" name="title" id="title" placeholder="請輸入公告標題" required>
+        
+        <label for="content">公告內容：</label>
+        <textarea name="content" id="content" rows="5" cols="40" placeholder="請輸入公告內容" required></textarea>
+        
+        <div class="btn-group">
+            <input type="submit" value="送出">
+            <button type="button" id="closeBtn">取消</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="edit_dialog">
+	<form action="" id="editAnnouncementForm">
+		<h3>編輯公告</h3>
+		<input type="hidden" id="edit_announcement_id">
+		<label for="edit_announcement_title">公告標題：</label>
+		<input type="text" id="edit_announcement_title">
+        <label for="edit_announcement_content">公告內容：</label>
+		<input type="text" id="edit_announcement_content">
+        <br>
+		<div class="btn-group">
+		<div class="submit"><input type="submit" value="送出修改">
+		<button type="button" id="edit_close_btn">取消</button></div>
+		</div>
+	</form>
+</dialog>
+
+<div class="container mt-3">
+	<div class="row">
+		<div class="col">
+			<nav aria-label="Page navigation example"></nav>
+		</div>
+	</div>
+    <div class="d-flex flex-row align-items-end">
+    <h2 class="p-2 mb-0 mb-2">公告列表</h2>
+    <div class="open-btn p-2 m-0 mb-2"><button class="btn btn-success" id="open">新增公告</button></div>
+    </div>
+    
+	<div class="row">
+		<div class="col">
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>發布人員</th>
+						<th>帳號</th>
+						<th>標題</th>
+						<th>公告內容</th>
+						<th>建立時間</th>
+						<th>更新時間</th>
+                        <th>編輯</th>
+                        <th>置頂</th>
+						<th>隱藏</th>
+					</tr>
+				</thead>
+				<tbody>
+                <% for(let an of announcements){ %>
+            	<tr>
+					<td><%= an.id %></td>
+					<td><%= an.author %></td>
+					<td><%= an.account %></td>
+					<td><%= an.title %></td>
+					<td><%= an.content %></td>
+					<td><%= an.created_at %></td>
+					<td><%= an.updated_at %></td>
+                    <!-- 編輯 icon -->
+					<td><i class="fa-solid fa-pen-to-square edit-announcement-btn" data-id="<%= an.id %>" data-title="<%= an.title %>" data-content="<%= an.content %>"></i></td>
+					<td><% if(an.pin == 1) {%>
+						<i class="fa-solid fa-thumbtack pin_icon text-primary" data-id="<%= an.id %>" data-pin="<%= an.pin %>"></i>
+                		<%} else {%>
+						<i class="fa-solid fa-thumbtack pin_icon text-secondary" style="opacity: 0.5;" data-id="<%= an.id %>" data-pin="<%= an.pin %>"></i>
+						<% } %>
+				 	</td>
+              		<td>
+						<% if(an.hide == 1) {%>
+						<i class="fa-solid fa-eye-slash hide_icon" data-id="<%= an.id %>" data-hide="<%= an.hide %>"></i>
+						<% } else {%>
+						<i class="fa-solid fa-eye hide_icon" data-id="<%= an.id %>" data-hide="<%= an.hide %>"></i>
+			  			<% } %>
+			  		</td>
+            	</tr>
+				<% } %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+	// 對話框
+	const dialog = document.getElementById("dialog");
+    const openBtn = document.getElementById("open");
+	const addForm = document.getElementById("addForm");
+	const titleInput = document.getElementById("title");
+	const contentInput = document.getElementById("content");
+	const closeBtn = document.getElementById("closeBtn");
+	
+	if (openBtn) {
+        openBtn.addEventListener("click", () => {
+            dialog.showModal(); // 顯示對話框
+        });
+    }
+
+    // 點擊按鈕關閉 Dialog
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            dialog.close();
+        });
+    }
+
+	// 置頂按鈕
+	document.addEventListener("click", async (e) => {
+    const pin_icon = e.target.closest(".pin_icon");
+    if (!pin_icon) return;
+
+    const id = Number(pin_icon.dataset.id);
+    const pin = Number(pin_icon.dataset.pin);
+    const newPin = pin === 1 ? 2 : 1;
+    
+    const res = await fetch(`/articles/announcement/pin`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_pinned: newPin, AnnouncementId: id })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+        location.reload();
+    }
+});
+
+// 隱藏按鈕
+	document.addEventListener("click", async (e) => {
+    const hide_icon = e.target.closest(".hide_icon");
+    if (!hide_icon) return;
+
+    const id = Number(hide_icon.dataset.id);
+    const hide = Number(hide_icon.dataset.hide);
+    const newHide = hide === 1 ? 0 : 1;
+    
+    const res = await fetch(`/articles/announcement/hide`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newHide, AnnouncementId: id })
+    });
+    const data = await res.json();
+
+    if (data.success) { 
+        location.reload();
+    }
+});
+
+// 新增公告
+if(addForm){
+addForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+	const created_by = 1;
+	const payload = {
+		title: titleInput.value,
+		content: contentInput.value,
+		created_by: created_by
+	};
+try {
+	const res = await fetch(`/articles/announcement/add`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json"
+		},
+		body: JSON.stringify(payload)
+	});
+
+	const data = await res.json();
+
+	if (data.success) {
+            alert(data.message);
+            location.reload(); // 成功後重新整理看結果
+        } else {
+            alert("失敗：" + data.message);
+        }
+    } catch (error) {
+        console.error("發生錯誤:", error);
+        alert("連線發生問題");
+    }
+});
+}
+</script>
+
+<!-- 編輯公告 -->
+<script>
+const editDialog = document.getElementById("edit_dialog");
+const editIdInput = document.getElementById("edit_announcement_id");
+const editTitleInput = document.getElementById("edit_announcement_title");
+const editContentInput = document.getElementById("edit_announcement_content");
+const editCloseBtn = document.getElementById("edit_close_btn");
+
+//編輯btn
+document.addEventListener("click", function (e) {
+    if (e.target.classList.contains("edit-announcement-btn")) {
+        const id = e.target.getAttribute("data-id");
+        const title = e.target.getAttribute("data-title");
+        const content = e.target.getAttribute("data-content");
+
+        //顯示目前的類別名稱
+        if (editIdInput && editTitleInput && editContentInput) {
+            editIdInput.value = id;
+            editTitleInput.value = title;
+            editContentInput.value = content;
+            editDialog.showModal();
+        }
+    }
+});
+
+if (editCloseBtn) {
+    editCloseBtn.addEventListener("click", () => {
+        editDialog.close();
+    });
+}
+
+//處理編輯送出
+const editForm = document.getElementById("editAnnouncementForm");
+if (editForm) {
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = editIdInput.value;
+        const updatedData = {
+            title: editTitleInput.value,
+            content: editContentInput.value
+        };
+        try {
+            const res = await fetch(`/articles/announcement/edit/${id}`, {
+                method: "PUT", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedData)
+            });
+
+            const data = await res.json();
+            if (data.success) {
+                alert("修改成功！");
+                location.reload(); 
+            } else {
+                alert("修改失敗：" + data.message);
+            }
+        } catch (error) {
+            console.error("錯誤:", error);
+            alert("連線發生問題");
+        }
+    });
+}
+</script>
+
+<%- include('../../partials/articles/html-scripts.ejs') %>
+<%- include('../../partials/articles/html-tail.ejs') %>

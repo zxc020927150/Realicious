@@ -1,0 +1,43 @@
+<%- include('../../partials/articles/html-head.ejs') %> <%-
+include('../../partials/articles/html-navbar.ejs') %>
+
+<div class="container mt-3">
+	<h2 class="m-0 mb-2">檢舉列表</h2>
+    <div class="container_table">
+	<div class="row">
+		<div class="col">
+			<table class="table table-striped table-bordered">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>檢舉人</th>
+						<th>作者</th>
+						<th>文章標題</th>
+						<th>文章內容</th>
+						<th>檢舉原因</th>
+                        <th>檢舉時間</th>
+                        <th>審核</th>
+					</tr>
+				</thead>
+				<tbody>
+                    <% for(let r of reports){ %>
+                        <tr>
+                        <td><%= r.id %></td>
+                        <td><%= r.reporter %></td>
+                        <td><%= r.author %></td>
+                        <td><%= r.title %></td>
+                        <td><%= r.content %></td>
+                        <td><%= r.reason %></td>
+                        <td><%= r.created_at %></td>
+                        <td><i class="fa-regular fa-circle-check"></i></td>
+                    </tr>
+                    <% } %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+    </div>
+</div>
+
+<%- include('../../partials/articles/html-scripts.ejs') %>
+<%- include('../../partials/articles/html-tail.ejs') %>

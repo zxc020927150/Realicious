@@ -1,0 +1,225 @@
+<div class="flex-1 overflow-y-auto p-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-700">✨ 新增店家</h1>
+        <a href="/restaurant" class="text-gray-500 hover:text-orange-600 flex items-center gap-1 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            返回列表
+        </a>
+    </div>
+
+    <form action="/restaurant/add" method="POST" class="space-y-6 pb-12">
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                🏠 基本資訊
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">店名 *</label>
+                    <input type="text" name="name" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">門市/分店名稱</label>
+                    <input type="text" name="branch" placeholder="例如：台北忠孝店" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">餐廳簡述</label>
+                    <textarea name="desc_brief" rows="2" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">聯絡電話</label>
+                    <input type="text" name="telephone" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">平均消費金額</label>
+    <button type="button" onclick="adjustAmount(-10)" class="px-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-600 transition-colors">-10</button>
+            
+            <!-- 輸入框：設 step="1" 允許任何整數，min="0" 禁止負數 -->
+            <input type="number" id="average_range" name="average_range" min="0" step="1 : 1" 
+                class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-center"
+                value="<%= typeof restaurantData !== 'undefined' ? (restaurantData.average_range || '') : '' %>">
+            
+            <!-- 加法按鈕 -->
+            <button type="button" onclick="adjustAmount(10)" class="px-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-600 transition-colors">+10</button>
+        </div>
+    </div>
+            </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                📍 地理位置
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">縣市</label>
+                    <input type="text" name="county" placeholder="例如：台北市" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">鄉鎮市區</label>
+                    <input type="text" name="district" placeholder="例如：大安區" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">捷運站 ID (FK)</label>
+                    <input type="number" name="station_id" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">完整地址</label>
+                    <input type="text" name="address" placeholder="請輸入完整道路地址" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                🕒 營業時間設定
+            </h2>
+            
+            <div class="space-y-3" id="work-hours-container">
+                <% const days = [
+                    { id: 'mon', name: '星期一' }, { id: 'tue', name: '星期二' },
+                    { id: 'wed', name: '星期三' }, { id: 'thu', name: '星期四' },
+                    { id: 'fri', name: '星期五' }, { id: 'sat', name: '星期六' },
+                    { id: 'sun', name: '星期日' }, { id: 'holiday', name: '國定假日' }
+                ]; %>
+                
+                <% days.forEach(day => { %>
+                    <div class="flex items-start gap-4 p-3 border border-gray-100 rounded-lg bg-gray-50/50 day-row" data-day="<%= day.id %>">
+                        <div class="w-20 pt-1 font-medium text-gray-700"><%= day.name %></div>
+                        
+                        <!-- ⚠️ 這是隱藏欄位！負責把 JS 算好的最終字串 (例如 ALL 或 09:00-12:00) 傳給後端 -->
+                        <input type="hidden" name="<%= day.id %>" class="real-input">
+
+                        <div class="flex-1 space-y-2">
+                            <!-- 狀態選擇器 -->
+                            <select class="status-select border border-gray-300 rounded-md px-3 py-1.5 text-sm outline-none focus:border-orange-400 bg-white">
+                                <option value="custom">自訂時間</option>
+                                <option value="ALL">24小時全天</option>
+                                <option value="null">公休無營業</option>
+                            </select>
+
+                            <!-- 自訂時間的容器 (如果選公休或全天，JS會把它隱藏) -->
+                            <div class="time-slots-container space-y-2">
+                                <div class="time-slot flex items-center gap-2">
+                                    <input type="time" class="start-time border border-gray-300 rounded px-2 py-1 text-sm outline-none">
+                                    <span class="text-gray-400">~</span>
+                                    <input type="time" class="end-time border border-gray-300 rounded px-2 py-1 text-sm outline-none">
+                                    <!-- 新增時段按鈕 -->
+                                    <button type="button" class="add-btn text-orange-500 hover:text-orange-600 text-sm font-bold px-2 py-1 bg-orange-100 rounded">+</button>
+                                    <!-- 刪除時段按鈕 (預設隱藏，有多個時段才出現) -->
+                                    <button type="button" class="remove-btn text-red-500 hover:text-red-600 text-sm font-bold px-2 py-1 bg-red-100 rounded hidden">x</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <button type="reset" class="px-6 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">
+                重填
+            </button>
+            <button type="submit" class="px-10 py-2 bg-orange-500 text-white rounded-md font-bold hover:bg-orange-600 shadow-md transition-all">
+                確認新增
+            </button>
+        </div>
+    </form>
+</div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 處理所有星期的互動邏輯
+        document.querySelectorAll('.day-row').forEach(row => {
+            const select = row.querySelector('.status-select');
+            const timeContainer = row.querySelector('.time-slots-container');
+
+            // 【修復 1】下拉選單改變時的邏輯：隱藏並清空
+            select.addEventListener('change', (e) => {
+                if(e.target.value === 'custom') {
+                    timeContainer.style.display = 'block';
+                } else {
+                    timeContainer.style.display = 'none';
+                    // 選擇全天或公休時，順手把裡面的時間清空，避免髒資料
+                    timeContainer.querySelectorAll('input[type="time"]').forEach(input => input.value = '');
+                }
+            });
+            
+            // 網頁載入時先觸發一次 change 事件，確保預設畫面狀態是正確的
+            select.dispatchEvent(new Event('change'));
+
+            // 【修復 3】處理新增/刪除按鈕
+            timeContainer.addEventListener('click', (e) => {
+                if(e.target.classList.contains('add-btn')) {
+                    // 複製一行新的時間選擇器
+                    const newSlot = row.querySelector('.time-slot').cloneNode(true);
+                    // 清空複製出來的數值
+                    newSlot.querySelector('.start-time').value = '';
+                    newSlot.querySelector('.end-time').value = '';
+                    // 把刪除按鈕顯示出來
+                    newSlot.querySelector('.remove-btn').classList.remove('hidden');
+                    // 加到畫面上
+                    timeContainer.appendChild(newSlot);
+                }
+                if(e.target.classList.contains('remove-btn')) {
+                    // 點擊 x 就刪除那一列
+                    e.target.closest('.time-slot').remove();
+                }
+            });
+
+            // 【修復 2】監聽時間輸入框，做「開始不能晚於結束」的防呆判斷
+            timeContainer.addEventListener('change', (e) => {
+                if(e.target.classList.contains('start-time') || e.target.classList.contains('end-time')) {
+                    const currentSlot = e.target.closest('.time-slot');
+                    const start = currentSlot.querySelector('.start-time').value;
+                    const end = currentSlot.querySelector('.end-time').value;
+
+                    // 如果兩個都有填，且開始時間大於等於結束時間
+                    if(start && end && start >= end) {
+                        alert('⚠️ 結束時間必須晚於開始時間喔！請重新調整。');
+                        e.target.value = ''; // 直接無情清空他剛剛填錯的那一格
+                    }
+                }
+            });
+        });
+
+        // 2. 攔截表單送出！背後默默把時間組成字串的魔法 (這段保持原樣)
+        document.querySelector('form').addEventListener('submit', (e) => {
+            document.querySelectorAll('.day-row').forEach(row => {
+                const status = row.querySelector('.status-select').value;
+                const realInput = row.querySelector('.real-input');
+                
+                if (status === 'ALL') {
+                    realInput.value = 'ALL';
+                } else if (status === 'null') {
+                    realInput.value = ''; 
+                } else {
+                    const slots = Array.from(row.querySelectorAll('.time-slot')).map(slot => {
+                        const start = slot.querySelector('.start-time').value;
+                        const end = slot.querySelector('.end-time').value;
+                        if (start && end) return `${start}-${end}`; 
+                        return null;
+                    }).filter(Boolean); 
+                    
+                    realInput.value = slots.join(';');
+                }
+            });
+        });
+    });
+    // 負責處理加減 10 元的魔法函數
+    function adjustAmount(offset) {
+        const input = document.getElementById('average_range');
+        // 抓出現在框框裡的數字，如果沒有填就是 0
+        let currentValue = parseInt(input.value) || 0;
+        
+        // 加上我們傳進來的數字 (10 或 -10)
+        let newValue = currentValue + offset;
+        
+        // 防呆機制：如果扣到變成負數，就強制把它設定回 0
+        if (newValue < 0) newValue = 0;
+        
+        // 把算好的新數字塞回輸入框裡顯示
+        input.value = newValue;
+    }
+    </script>

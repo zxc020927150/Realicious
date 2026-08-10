@@ -1,0 +1,21 @@
+.toastDrop {
+  animation: toastDrop 0.32s steps(6, end) both;
+}
+
+@keyframes toastDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toastDrop {
+    animation: none;
+  }
+}

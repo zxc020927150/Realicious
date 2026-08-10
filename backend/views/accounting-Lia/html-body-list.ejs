@@ -1,0 +1,115 @@
+<div class="flex-1 overflow-y-auto p-8">
+    
+<!-- 加上 form 標籤，設定 action 指向我們要新增的路由，並使用 POST 方法 -->
+    <h1 class="text-lg font-bold text-gray-700">店家權重管理</h1>
+<form action="/accounting" method="GET" class="bg-white p-6 rounded-lg shadow-sm border border-orange-100 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">用戶名稱</label>
+            <!-- 加上 name="username" -->
+            <input type="text" name="username" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent" placeholder="輸入用戶名稱或ID...">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-600 mb-1">是否開啟吃土模式</label>
+            <!-- 加上 name="is_poor_mode" -->
+            <select name="is_poor_mode" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400">
+                <option value="">全部</option>
+                <!-- value 改成對應資料庫的 Y 和 N -->
+                <option value="Y">是</option>
+                <option value="N">否</option>
+            </select>
+        </div>
+    </div>
+    <div class="flex gap-2">
+        <!-- 加上 type="submit" 觸發傳送 -->
+        <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            查詢
+        </button>
+        <!-- 加上 type="reset" 觸發清除輸入框 -->
+        <button type="reset" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-md text-sm font-medium transition-colors">
+            清除
+        </button>
+    </div>
+</form>
+
+    <div class="bg-white rounded-lg shadow-sm border border-orange-100 flex flex-col">
+        <div class="p-4 border-b border-gray-100 flex justify-between items-center bg-orange-50/50 rounded-t-lg">
+            <div class="text-sm text-gray-500">找到 <%= totalRows %> 筆結果</div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-gray-700 font-medium border-b border-gray-200">
+                    <tr>
+                        <th class="px-4 py-3">ID</th>
+                        <th class="px-4 py-3">會員名稱</th>
+                        <th class="px-4 py-3">每月預算</th>
+                        <th class="px-4 py-3">重製日</th>
+                        <th class="px-4 py-3">吃土模式</th>
+                        <th class="px-4 py-3">建立時間</th>
+                        <th class="px-4 py-3">修改時間</th>
+
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% records.forEach(function(item) { %>
+                    <tr class="hover:bg-orange-50/50 transition-colors">
+                        <!-- ID -->
+                        <td class="px-4 py-3"><%= item.id %></td>
+                        
+                        <!-- 會員名稱 -->
+                        <td class="px-4 py-3"><%= item.full_name %></td>
+                        
+                        <!-- 每月預算 (加上錢字號) -->
+                        <td class="px-4 py-3 font-semibold text-gray-700">$<%= item.monthly_budget %></td>
+                        
+                        <!-- 重製日 -->
+                        <td class="px-4 py-3"><%= item.reset_date %> 號</td>
+                        
+                        <!-- 是否開啟吃土模式 (根據 Y/N 變色與換字) -->
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 <%= item.is_poor_mode_enabled === 'Y' ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500' %> rounded-full text-xs">
+                                <%= item.is_poor_mode_enabled === 'Y' ? '符合' : '不符合' %>
+                            </span>
+                        </td>
+                        
+                        <!-- 建立時間 -->
+                        <td class="px-4 py-3"><%= item.create_time %></td>
+                        
+                        <!-- 修改時間 -->
+                        <td class="px-4 py-3"><%= item.update_time %></td>
+                        
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+<div class="p-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+    <div>
+        顯示第 <%= totalRows > 0 ? (page - 1) * perPage + 1 : 0 %> 至 
+        <%= page * perPage > totalRows ? totalRows : page * perPage %> 項結果，
+        共 <%= totalRows %> 項
+    </div>
+    <div class="flex gap-1">
+        
+        <a href="/accounting?username=<%= username %>&is_poor_mode=<%= is_poor_mode %>&page=<%= page - 1 %>" 
+        class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === 1 ? 'pointer-events-none opacity-50' : '' %>">
+            上一頁
+        </a>
+
+        <% for(let i = 1; i <= totalPages; i++) { %>
+            <a href="/accounting?username=<%= username %>&is_poor_mode=<%= is_poor_mode %>&page=<%= i %>" 
+            class="px-3 py-1 rounded <%= page === i ? 'bg-orange-500 text-white' : 'border border-gray-200 hover:bg-gray-50 text-gray-700' %>">
+                <%= i %>
+            </a>
+        <% } %>
+
+        <a href="/accounting?username=<%= username %>&is_poor_mode=<%= is_poor_mode %>&page=<%= page + 1 %>" 
+        class="px-3 py-1 border border-gray-200 rounded hover:bg-gray-50 <%= page === totalPages ? 'pointer-events-none opacity-50' : '' %>">
+            下一頁
+        </a>
+    </div>
+</div>
+    </div>
+
+</div>

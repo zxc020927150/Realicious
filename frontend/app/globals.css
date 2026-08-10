@@ -1,0 +1,512 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "ckeditor5/ckeditor5.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+	--font-pixel: var(--font-pixel); /* pixel 字體 */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--font-sans: var(--font-sans);
+	--font-mono: var(--font-geist-mono);
+	--font-heading: var(--font-heading);
+	--color-sidebar-ring: var(--sidebar-ring);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar: var(--sidebar);
+	--color-chart-5: var(--chart-5);
+	--color-chart-4: var(--chart-4);
+	--color-chart-3: var(--chart-3);
+	--color-chart-2: var(--chart-2);
+	--color-chart-1: var(--chart-1);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-article-gray: #e8e8e8;
+	--color-button-yellow: #ffd45c;
+	--color-button-white: #fcf9f6;
+	--color-page-red: #bb0015;
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+	--radius-3xl: calc(var(--radius) * 2.2);
+	--radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+	--background: oklch(1 0 0);
+	--foreground: oklch(0.147 0.004 49.3);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.147 0.004 49.3);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.147 0.004 49.3);
+	--primary: oklch(0.214 0.009 43.1);
+	--primary-foreground: oklch(0.986 0.002 67.8);
+	--secondary: oklch(0.96 0.002 17.2);
+	--secondary-foreground: oklch(0.214 0.009 43.1);
+	--muted: oklch(0.96 0.002 17.2);
+	--muted-foreground: oklch(0.547 0.021 43.1);
+	--accent: oklch(0.96 0.002 17.2);
+	--accent-foreground: oklch(0.214 0.009 43.1);
+	--destructive: oklch(0.577 0.245 27.325);
+	--border: oklch(0.922 0.005 34.3);
+	--input: oklch(0.922 0.005 34.3);
+	--ring: oklch(0.714 0.014 41.2);
+	--chart-1: oklch(0.868 0.007 39.5);
+	--chart-2: oklch(0.547 0.021 43.1);
+	--chart-3: oklch(0.438 0.017 39.3);
+	--chart-4: oklch(0.367 0.016 35.7);
+	--chart-5: oklch(0.268 0.011 36.5);
+	--radius: 0.625rem;
+	--sidebar: oklch(0.986 0.002 67.8);
+	--sidebar-foreground: oklch(0.147 0.004 49.3);
+	--sidebar-primary: oklch(0.214 0.009 43.1);
+	--sidebar-primary-foreground: oklch(0.986 0.002 67.8);
+	--sidebar-accent: oklch(0.96 0.002 17.2);
+	--sidebar-accent-foreground: oklch(0.214 0.009 43.1);
+	--sidebar-border: oklch(0.922 0.005 34.3);
+	--sidebar-ring: oklch(0.714 0.014 41.2);
+}
+
+.dark {
+	--background: oklch(0.147 0.004 49.3);
+	--foreground: oklch(0.986 0.002 67.8);
+	--card: oklch(0.214 0.009 43.1);
+	--card-foreground: oklch(0.986 0.002 67.8);
+	--popover: oklch(0.214 0.009 43.1);
+	--popover-foreground: oklch(0.986 0.002 67.8);
+	--primary: oklch(0.922 0.005 34.3);
+	--primary-foreground: oklch(0.214 0.009 43.1);
+	--secondary: oklch(0.268 0.011 36.5);
+	--secondary-foreground: oklch(0.986 0.002 67.8);
+	--muted: oklch(0.268 0.011 36.5);
+	--muted-foreground: oklch(0.714 0.014 41.2);
+	--accent: oklch(0.268 0.011 36.5);
+	--accent-foreground: oklch(0.986 0.002 67.8);
+	--destructive: oklch(0.704 0.191 22.216);
+	--border: oklch(1 0 0 / 10%);
+	--input: oklch(1 0 0 / 15%);
+	--ring: oklch(0.547 0.021 43.1);
+	--chart-1: oklch(0.868 0.007 39.5);
+	--chart-2: oklch(0.547 0.021 43.1);
+	--chart-3: oklch(0.438 0.017 39.3);
+	--chart-4: oklch(0.367 0.016 35.7);
+	--chart-5: oklch(0.268 0.011 36.5);
+	--sidebar: oklch(0.214 0.009 43.1);
+	--sidebar-foreground: oklch(0.986 0.002 67.8);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.986 0.002 67.8);
+	--sidebar-accent: oklch(0.268 0.011 36.5);
+	--sidebar-accent-foreground: oklch(0.986 0.002 67.8);
+	--sidebar-border: oklch(1 0 0 / 10%);
+	--sidebar-ring: oklch(0.547 0.021 43.1);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground;
+	}
+	html {
+		@apply font-sans;
+	}
+}
+
+.article-editor {
+	min-width: 0;
+}
+
+.article-page
+	:is(
+		a[href],
+		button:not(:disabled),
+		select:not(:disabled),
+		[role="button"]:not([aria-disabled="true"]),
+		[role="menuitem"]:not([aria-disabled="true"]),
+		[role="menuitemradio"]:not([aria-disabled="true"])
+	) {
+	cursor: pointer;
+}
+
+.article-editor .ck.ck-editor,
+.article-editor .ck-editor__main {
+	min-width: 0;
+	width: 100%;
+}
+
+.article-editor .ck.ck-toolbar {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	border: 0;
+	border-bottom: 1px solid var(--ck-color-base-border);
+	border-radius: 0;
+	/* CKEditor 的下拉面板位於工具列內；不可用 overflow 裁切它。 */
+	overflow: visible;
+	flex-wrap: wrap;
+	position: relative;
+	z-index: 1;
+}
+
+.article-editor .ck.ck-toolbar > .ck-toolbar__items {
+	min-width: 0;
+	max-width: 100%;
+	flex-wrap: wrap;
+}
+
+.article-editor .ck-editor__editable {
+	min-height: 36rem !important;
+	max-width: 100%;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+}
+
+.article-editor .ck-content img {
+	max-width: 100%;
+}
+
+.article-editor .ck-content figure.table {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.article-editor .ck-content ul {
+	list-style-type: disc !important;
+	padding-left: 2.5em !important;
+}
+
+.article-editor .ck-content ol {
+	list-style-type: decimal !important;
+	padding-left: 2.5em !important;
+}
+
+:root {
+	--ck-z-default: 1 !important;
+	--ck-z-panel: 20 !important;
+	--ck-z-dialog: 25 !important;
+}
+
+.article-content {
+	line-height: 1.8;
+}
+
+.article-content p {
+	margin-block: 1rem;
+}
+
+.article-content img {
+	height: auto;
+	max-width: 100%;
+}
+
+.article-content figure.image {
+	clear: both;
+	margin: 1rem auto;
+	max-width: 100%;
+}
+
+.article-content figure.image img {
+	display: block;
+	margin-inline: auto;
+}
+
+.article-content span.image-inline {
+	display: inline-flex;
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+.article-content .image-style-side,
+.article-content .image-style-align-right {
+	float: right;
+	margin-left: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-left {
+	float: left;
+	margin-right: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-center,
+.article-content .image-style-block-align-left,
+.article-content .image-style-block-align-right {
+	max-width: 100%;
+}
+
+.article-content .image-style-block-align-left {
+	margin-left: 0;
+}
+
+.article-content .image-style-block-align-right {
+	margin-right: 0;
+}
+
+.article-content::after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+@media (max-width: 639px) {
+	.article-content .image-style-side,
+	.article-content .image-style-align-left,
+	.article-content .image-style-align-right {
+		float: none;
+		margin-inline: auto;
+		max-width: 100%;
+	}
+}
+
+.article-content figure.table {
+	max-width: 100%;
+	overflow-x: auto;
+}
+
+.ck-content h1 {
+	font-size: 2em !important;
+	font-weight: bold !important;
+}
+
+.ck-content h2 {
+	font-size: 1.5em !important;
+	font-weight: bold !important;
+}
+
+.ck-content h3 {
+	font-size: 1.17em !important;
+	font-weight: bold !important;
+}
+
+/* Force code block appearance in article view to match editor (light gray background) */
+.article-content .ck-code-block,
+.article-content pre,
+.article-content pre code,
+.article-content .code-block {
+	background: #f3f4f6 !important; /* light gray similar to editor */
+	color: #111827 !important; /* dark text for readability */
+	padding: 1rem !important;
+	border-radius: 0.375rem !important;
+	overflow: auto !important;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace !important;
+}
+
+.article-content pre code {
+	background: transparent !important;
+}
+
+/* Minimal table styles for published articles (restores grid lines without broad overrides) */
+.article-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0 0 1rem;
+}
+
+.article-content th,
+.article-content td {
+	border: 1px solid #000;
+	padding: 0.5rem 0.75rem;
+	text-align: left;
+	vertical-align: top;
+}
+
+.article-content thead th {
+	background: #f3f4f6;
+	font-weight: 700;
+}
+
+/* Small screens: allow table horizontal scroll when needed */
+.article-content .table-responsive {
+	overflow-x: auto;
+}
+
+/* Hero carousel orbit — centered at hero right-middle (right edge vertical center) */
+
+/* core orbit variables (defaults for desktop) */
+:root {
+	--orbit-radius: 500px; /* distance from orbit center to plate center */
+	--plate-size: 600px; /* plate width/height */
+	--orbit-diameter: calc((var(--orbit-radius) * 2) + var(--plate-size));
+}
+
+/* Position the orbit so its center aligns with the hero area's right middle. Right offset uses half the diameter to place the orbit center exactly at the hero's right edge middle. */
+.orbit {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: var(--orbit-diameter);
+	height: var(--orbit-diameter);
+	right: calc(var(--orbit-diameter) / -2);
+	pointer-events: none;
+	display: block;
+}
+
+/* inner container rotates around its center */
+.orbit-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: 50% 50%;
+	animation: orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+/* plates: positioned at the center then offset along radius by rotate(... ) translate(radius) */
+.plate {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: var(--plate-size);
+	height: var(--plate-size);
+	border-radius: 9999px;
+	overflow: hidden;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+	transform-origin: center center;
+}
+
+/* place three plates evenly on the circle; keep images upright by counter-rotating using a synchronized animation */
+.plate-1 {
+	transform: translate(-50%, -50%) rotate(180deg) translate(var(--orbit-radius))
+		rotate(-180deg);
+	z-index: 30;
+}
+
+.plate-2 {
+	transform: translate(-50%, -50%) rotate(300deg) translate(var(--orbit-radius))
+		rotate(-300deg);
+	z-index: 20;
+}
+.plate-3 {
+	transform: translate(-50%, -50%) rotate(60deg) translate(var(--orbit-radius))
+		rotate(-60deg);
+	z-index: 20;
+}
+
+/* synchronized counter-rotation to keep images upright */
+.plate-content {
+	/* position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: center center;
+	animation: counter-orbit 12s linear infinite; */
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: center center;
+	animation: counter-orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+@keyframes orbit-step {
+	/* 第一張停留 (0s ~ 2s) */
+	0%,
+	22.2% {
+		transform: rotate(0deg);
+	}
+	/* 滑動到第二張 (2s ~ 3s) */
+	33.3%,
+	55.5% {
+		transform: rotate(-120deg);
+	}
+	/* 滑動到第三張 (5s ~ 6s) */
+	66.6%,
+	88.8% {
+		transform: rotate(-240deg);
+	}
+	/* 滑動回第一張 (8s ~ 9s) */
+	100% {
+		transform: rotate(-360deg);
+	}
+}
+
+@keyframes counter-orbit-step {
+	0%,
+	22.2% {
+		transform: rotate(0deg);
+	}
+	33.3%,
+	55.5% {
+		transform: rotate(120deg);
+	}
+	66.6%,
+	88.8% {
+		transform: rotate(240deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.hero-copy { z-index: 40; }
+
+/* Responsive — smaller orbit and plates for <=1024px */
+@media (max-width: 1024px) {
+	:root {
+		--orbit-radius: 320px;
+		--plate-size: 320px;
+	}
+	/* orbit diameter will recompute from the variables */
+	.orbit {
+		width: var(--orbit-diameter);
+		height: var(--orbit-diameter);
+		right: calc(var(--orbit-diameter) / -2);
+	}
+	.plate {
+		width: var(--plate-size);
+		height: var(--plate-size);
+	}
+}
+
+.article-editor {
+	position: relative;
+}
+.article-editor .ck-dropdown__panel {
+	z-index: 21 !important;
+}
+
+/* 手機版重新排版 */
+@media (max-width: 640px) {
+	.hero-copy {
+		justify-content: space-between;
+		padding: 32px 0 40px;
+	}
+
+	.hero-title {
+		margin-top: 0;
+	}
+
+	.hero-bottom {
+		width: 65%;
+	}
+
+	:root {
+		--orbit-radius: 250px;
+		--plate-size: 250px;
+	}
+
+	.orbit {
+		right: calc(var(--orbit-diameter) / -2 + 25px);
+	}
+}

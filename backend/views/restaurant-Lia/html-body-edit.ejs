@@ -1,0 +1,220 @@
+<div class="flex-1 overflow-y-auto p-8">
+    <div class="flex items-center justify-between mb-6">
+        <!-- 🌟 標題記得改成編輯 -->
+        <h1 class="text-2xl font-bold text-gray-700">✨ 編輯店家</h1>
+        <a href="/restaurant" class="text-gray-500 hover:text-orange-600 flex items-center gap-1 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            返回列表
+        </a>
+    </div>
+
+    <form action="/restaurant/edit/<%= restaurantData.id %>" method="POST" class="space-y-6 pb-12">
+        
+        <!-- 🏠 基本資訊卡片 -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                🏠 基本資訊
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">店名 *</label>
+                    <input type="text" name="name" value="<%= restaurantData.name %>" required class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">門市/分店名稱</label>
+                    <input type="text" name="branch" value="<%= restaurantData.branch || '' %>" placeholder="例如：台北忠孝店" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">餐廳簡述</label>
+                    <textarea name="desc_brief" rows="2" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none"><%= restaurantData.desc_brief || '' %></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">聯絡電話</label>
+                    <input type="text" name="telephone" value="<%= restaurantData.telephone || '' %>" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <!-- 🌟 均消區塊：確保 div 層級正確，不影響外層 grid -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">平均消費金額</label>
+                    <div class="flex gap-1">
+                        <button type="button" onclick="adjustAmount(-10)" class="px-3 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-600 transition-colors">-10</button>
+                        <input type="number" id="average_range" name="average_range" value="<%= restaurantData.average_range || '' %>" min="0" step="1" 
+                               class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-center">
+                        <button type="button" onclick="adjustAmount(10)" class="px-3 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-gray-600 transition-colors">+10</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📍 地理位置卡片 -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                📍 地理位置
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">縣市</label>
+                    <input type="text" name="county" value="<%= restaurantData.county || '' %>" placeholder="例如：台北市" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">鄉鎮市區</label>
+                    <input type="text" name="district" value="<%= restaurantData.district || '' %>" placeholder="例如：大安區" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600 mb-1">捷運站 ID (FK)</label>
+                    <input type="number" name="station_id" value="<%= restaurantData.station_id || '' %>" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">完整地址</label>
+                    <input type="text" name="address" value="<%= restaurantData.address || '' %>" placeholder="請輸入完整道路地址" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none">
+                </div>
+            </div>
+        </div>
+
+        <!-- 🕒 營業時間卡片 -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-orange-100">
+            <h2 class="text-lg font-semibold text-orange-600 mb-4 flex items-center gap-2">
+                🕒 營業時間設定
+            </h2>
+            <div class="space-y-3" id="work-hours-container">
+                <% const days = [
+                    { id: 'mon', name: '星期一' }, { id: 'tue', name: '星期二' },
+                    { id: 'wed', name: '星期三' }, { id: 'thu', name: '星期四' },
+                    { id: 'fri', name: '星期五' }, { id: 'sat', name: '星期六' },
+                    { id: 'sun', name: '星期日' }, { id: 'holiday', name: '國定假日' }
+                ]; %>
+                <% days.forEach(day => { 
+                    const oldTime = workHourData[day.id] || ''; 
+                %>
+                    <div class="flex items-start gap-4 p-3 border border-gray-100 rounded-lg bg-gray-50/50 day-row" data-day="<%= day.id %>" data-old-time="<%= oldTime %>">
+                        <div class="w-20 pt-1 font-medium text-gray-700"><%= day.name %></div>
+                        <input type="hidden" name="<%= day.id %>" class="real-input">
+                        <div class="flex-1 space-y-2">
+                            <select class="status-select border border-gray-300 rounded-md px-3 py-1.5 text-sm outline-none focus:border-orange-400 bg-white">
+                                <option value="custom">自訂時間</option>
+                                <option value="ALL">24小時全天</option>
+                                <option value="null">公休無營業</option>
+                            </select>
+                            <div class="time-slots-container space-y-2">
+                                <div class="time-slot flex items-center gap-2">
+                                    <input type="time" class="start-time border border-gray-300 rounded px-2 py-1 text-sm outline-none">
+                                    <span class="text-gray-400">~</span>
+                                    <input type="time" class="end-time border border-gray-300 rounded px-2 py-1 text-sm outline-none">
+                                    <button type="button" class="add-btn text-orange-500 hover:text-orange-600 text-sm font-bold px-2 py-1 bg-orange-100 rounded">+</button>
+                                    <button type="button" class="remove-btn text-red-500 hover:text-red-600 text-sm font-bold px-2 py-1 bg-red-100 rounded hidden">x</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4">
+            <a href="/restaurant" class="px-6 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-100 transition-colors">取消</a>
+            <button type="submit" class="px-10 py-2 bg-blue-500 text-white rounded-md font-bold hover:bg-blue-600 shadow-md transition-all">
+                儲存修改
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // JS 內容保持原樣，確保 adjustAmount 和營業時間邏輯運作
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.day-row').forEach(row => {
+            const select = row.querySelector('.status-select');
+            const timeContainer = row.querySelector('.time-slots-container');
+
+            select.addEventListener('change', (e) => {
+                if(e.target.value === 'custom') {
+                    timeContainer.style.display = 'block';
+                } else {
+                    timeContainer.style.display = 'none';
+                    timeContainer.querySelectorAll('input[type="time"]').forEach(input => input.value = '');
+                }
+            });
+
+            const oldTime = row.getAttribute('data-old-time');
+            if (oldTime === 'ALL') {
+                select.value = 'ALL';
+                select.dispatchEvent(new Event('change'));
+            } else if (!oldTime || oldTime === 'null') {
+                select.value = 'null';
+                select.dispatchEvent(new Event('change'));
+            } else {
+                select.value = 'custom';
+                select.dispatchEvent(new Event('change'));
+                const timeRanges = oldTime.split(';');
+                timeRanges.forEach((range, index) => {
+                    const [start, end] = range.split('-'); 
+                    let targetSlot;
+                    if (index === 0) {
+                        targetSlot = timeContainer.querySelector('.time-slot');
+                    } else {
+                        const addBtn = timeContainer.querySelector('.add-btn');
+                        addBtn.click();
+                        const allSlots = timeContainer.querySelectorAll('.time-slot');
+                        targetSlot = allSlots[allSlots.length - 1];
+                    }
+                    if(start) targetSlot.querySelector('.start-time').value = start;
+                    if(end) targetSlot.querySelector('.end-time').value = end;
+                });
+            }
+
+            timeContainer.addEventListener('click', (e) => {
+                if(e.target.classList.contains('add-btn')) {
+                    const newSlot = row.querySelector('.time-slot').cloneNode(true);
+                    newSlot.querySelector('.start-time').value = '';
+                    newSlot.querySelector('.end-time').value = '';
+                    newSlot.querySelector('.remove-btn').classList.remove('hidden');
+                    timeContainer.appendChild(newSlot);
+                }
+                if(e.target.classList.contains('remove-btn')) {
+                    e.target.closest('.time-slot').remove();
+                }
+            });
+
+            timeContainer.addEventListener('change', (e) => {
+                if(e.target.classList.contains('start-time') || e.target.classList.contains('end-time')) {
+                    const currentSlot = e.target.closest('.time-slot');
+                    const start = currentSlot.querySelector('.start-time').value;
+                    const end = currentSlot.querySelector('.end-time').value;
+                    if(start && end && start >= end) {
+                        alert('⚠️ 結束時間必須晚於開始時間喔！請重新調整。');
+                        e.target.value = ''; 
+                    }
+                }
+            });
+        });
+
+        document.querySelector('form').addEventListener('submit', (e) => {
+            document.querySelectorAll('.day-row').forEach(row => {
+                const status = row.querySelector('.status-select').value;
+                const realInput = row.querySelector('.real-input');
+                if (status === 'ALL') {
+                    realInput.value = 'ALL';
+                } else if (status === 'null') {
+                    realInput.value = ''; 
+                } else {
+                    const slots = Array.from(row.querySelectorAll('.time-slot')).map(slot => {
+                        const start = slot.querySelector('.start-time').value;
+                        const end = slot.querySelector('.end-time').value;
+                        if (start && end) return `${start}-${end}`; 
+                        return null;
+                    }).filter(Boolean); 
+                    realInput.value = slots.join(';');
+                }
+            });
+        });
+    });
+
+    function adjustAmount(offset) {
+        const input = document.getElementById('average_range');
+        let currentValue = parseInt(input.value) || 0;
+        let newValue = currentValue + offset;
+        if (newValue < 0) newValue = 0;
+        input.value = newValue;
+    }
+</script>

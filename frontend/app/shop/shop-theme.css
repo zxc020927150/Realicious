@@ -1,0 +1,51 @@
+/* 商城共用視覺語言：對齊首頁與記帳小雞的黑、黃、紅、暖白色票。 */
+.shop-theme {
+  --shop-ink: #1a1721;
+  --shop-paper: #fffaf0;
+  --shop-yellow: #ffd45c;
+  --shop-yellow-soft: #fff0b8;
+  --shop-red: #bb0015;
+  --shop-red-dark: #8e0010;
+}
+
+/* 將既有商城元件的舊色票集中映射，避免影響 article、user 等其他區域。 */
+.shop-theme .bg-\[\#3D2419\] { background-color: var(--shop-ink); }
+.shop-theme .text-\[\#3D2419\] { color: var(--shop-ink); }
+.shop-theme .border-\[\#3D2419\] { border-color: var(--shop-ink); }
+
+.shop-theme .bg-\[\#FCF9F6\],
+.shop-theme .bg-\[\#FFF9E6\],
+.shop-theme .bg-white { background-color: var(--shop-paper); }
+.shop-theme .bg-\[\#ffffff\] { background-color: var(--shop-paper); }
+
+.shop-theme .bg-\[\#FFD3B6\] { background-color: var(--shop-yellow-soft); }
+.shop-theme .hover\:bg-\[\#ffbe94\]:hover { background-color: var(--shop-yellow); }
+.shop-theme .hover\:bg-\[\#FBDF58\]:hover { background-color: var(--shop-yellow); }
+
+/* 原本棕色的主操作與價格，統一回首頁的品牌紅。 */
+.shop-theme .bg-\[\#89502E\],
+.shop-theme .bg-\[\#FF6B6B\] { background-color: var(--shop-red); }
+.shop-theme .hover\:bg-\[\#a06040\]:hover,
+.shop-theme .hover\:bg-\[\#ff8585\]:hover { background-color: var(--shop-red-dark); }
+.shop-theme .text-\[\#8C5230\] { color: var(--shop-red); }
+
+/* 深色按鈕保留為次要操作，但 hover 時使用首頁同款深墨黑。 */
+.shop-theme .hover\:bg-\[\#5a3a2a\]:hover,
+.shop-theme .hover\:bg-\[\#523324\]:hover { background-color: #302a3b; }
+
+@keyframes shop-confetti-pop {
+  0%, 100% { transform: translateX(var(--confetti-x)) translateY(0); }
+  50% { transform: translateX(var(--confetti-x)) translateY(-7px); }
+}
+
+.shop-confetti {
+  animation: shop-confetti-pop 1.5s steps(2, end) infinite;
+}
+
+.shop-confetti-delay {
+  animation-delay: -0.75s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-confetti { animation: none; }
+}

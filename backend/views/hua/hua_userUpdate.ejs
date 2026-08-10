@@ -1,0 +1,82 @@
+<%- include('partials/hua_html_head.ejs') %> 
+<%- include('partials/hua_html_navbar.ejs') %>
+<div class="container col-6">
+  <a class="btn btn-dark" href="/userManager/userList"><i class="fa-solid fa-angle-left"></i>會員管理</a>
+<br><br>
+  <% if (message.length > 0) { %>
+  <div class="alert alert-primary">
+    <%= message %>
+  </div>  
+  <% } %>
+  <% if (error.length > 0) { %>
+  <div class="alert alert-danger">
+    <%= error %>
+  </div>  
+  <% } %>
+  <form method="post" action="/userManager/userUpdate/revise">
+  <% const {id,account,role,status,last_name,first_name,nick_name,city,district,address,phone,birthday} = users[0] %>
+  <div class="mb-3">
+    <label for="" class="form-label">id</label>
+    <input name="id" type="hidden" class="form-control" value="<%= id %>" readonly>
+    <input name="id" type="text" class="form-control" value="<%= id %>" disabled>
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">帳號</label>
+    <input name="account" type="hidden" class="form-control" value="<%= account %>" readonly>
+    <input name="account" type="text" class="form-control" value="<%= account %>" disabled>
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">使用者權限</label>
+    <!-- <input name="role" type="text" class="form-control" value="<%= role %>"> -->
+    <select name="role" class="form-control">
+      <option value="0" <%= role == 0 ? 'selected' : '' %>>系統管理員 (0)</option>
+      <option value="1" <%= role == 1 ? 'selected' : '' %>>一般管理員 (1)</option>
+      <option value="10" <%= role == 10 ? 'selected' : '' %>>商家會員 (10)</option>
+      <option value="11" <%= role == 11 ? 'selected' : '' %>>一般會員 (11)</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">帳戶狀態</label>
+    <!-- <input name="status" type="text" class="form-control" value="<%= status %>"> -->
+    <select name="status" id="status" class="form-control">
+      <option value="1" <%= status == 1 ? 'selected' : '' %>>正常 (1)</option>
+      <option value="0" <%= status == 0 ? 'selected' : '' %>>停權 (0)</option>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">姓氏</label>
+    <input name="last_name" type="text" class="form-control" value="<%= last_name %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">姓名</label>
+    <input name="first_name" type="text" class="form-control" value="<%= first_name %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">暱稱</label>
+    <input name="nick_name" type="text" class="form-control" value="<%= nick_name %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">縣市</label>
+    <input name="city" type="text" class="form-control" value="<%= city %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">鄉鎮</label>
+    <input name="district" type="text" class="form-control" value="<%= district %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">地址</label>
+    <input name="address" type="text" class="form-control" value="<%= address %>">
+  </div>
+  <div class="mb-3">
+    <label for="" class="form-label">電話</label>
+    <input name="phone" type="number" class="form-control" value="<%= phone %>">
+  </div><div class="mb-3">
+    <label for="" class="form-label">生日</label>
+    <input name="birthday" type="text" class="form-control" value="<%= birthday %>">
+  </div>
+  
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+
+<%- include('partials/hua_html_end.ejs') %>

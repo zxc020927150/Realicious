@@ -1,0 +1,65 @@
+<!-- 引入 Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- 引入 Font Awesome (修正版本號) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+<div class="container mt-5">
+  <!-- 標題與上方動作列 -->
+  <div class="d-flex justify-content-between align-items-end mb-4">
+    <div>
+      <h2 class="fw-bold text-dark mb-0">捷運站列表</h2>
+      <p class="text-muted small">管理目前系統內所有的捷運站點資訊</p>
+    </div>
+    <a href="/station/add" class="btn btn-primary">
+      <i class="fa-solid fa-plus me-1"></i> 新增捷運資料
+    </a>
+  </div>
+
+  <!-- 資料表格卡片 -->
+  <div class="card shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>站名</th>
+            <th>站碼</th>
+            <th>線路</th>
+            <th class="text-center">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% data.forEach((item) => { %>
+            <tr>
+              <td><%= item.站名 %></td>
+              <td>
+                <span class="badge bg-secondary opacity-75"><%= item.所有站碼 %></span>
+              </td>
+              <td><%= item.所有線路 %></td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm">
+                  <a href="/station/edit/<%= item.站號 %>" class="btn btn-outline-primary" title="修改">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </a>
+                  <a href="/station/delete/<%= item.站號 %>" 
+                     class="btn btn-outline-danger" 
+                     onclick="return confirm('確定要刪除 [<%= item.站名 %>] 嗎？')"
+                     title="刪除">
+                    <i class="fa-solid fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 底部連結 -->
+  <div class="mt-4 text-center">
+    <a href="/" class="text-decoration-none text-muted small">
+      <i class="fa-solid fa-house me-1"></i> 前往首頁
+    </a>
+  </div>
+</div>

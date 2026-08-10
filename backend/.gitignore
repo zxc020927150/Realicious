@@ -1,0 +1,11 @@
+.vscode
+.env
+node_modules
+.DS_Store
+package-lock.json
+pnpm-lock.yaml
+.pnpm-store/
+src/generated/prisma
+
+public/user/avatars/*
+!public/user/avatars/.gitkeep

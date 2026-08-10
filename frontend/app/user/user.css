@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+/* 錯誤晃動 */
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* 團片放大縮小動畫 */
+@keyframes pulseSlow {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2); /* 稍微放大一點 */
+  }
+}
+.animate-pulse-slow {
+  animation: pulseSlow 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* 定義邊框閃爍動畫 */
+@keyframes borderBlink {
+  0%, 100% {
+    border-color: rgba(251, 191, 36, 1); /* amber-400 */
+  }
+  50% {
+    border-color: rgba(251, 191, 36, 0.1); /* amber-400 幾近透明 */
+  }
+}
+.animate-border-blink {
+  animation: borderBlink 1.5s ease-in-out infinite;
+}
+
+.cube {
+  font-family: ;
+}
