@@ -125,11 +125,11 @@ REALICIOUS/
 
 ### 3.設定環境變數 (.env)
 
-請分別在 backend/ 與 frontend/ 目錄下，參考 .env.example 建立 .env 檔案
+* 請分別在 backend/ 與 frontend/ 目錄下，參考 .env.example 建立 .env 檔案
 
 ### 4.資料庫初始化
 
-開啟 MySQL CLI 或 GUI 工具，建立新資料庫
+* 開啟 MySQL CLI 或 GUI 工具，建立新資料庫
 
 `CREATE DATABASE realicious CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 
@@ -137,21 +137,21 @@ REALICIOUS/
 
 `cd backend`
 
-執行資料庫 Migration
+* 執行資料庫 Migration
 
 `npx prisma migrate dev`
 
-導入測試用種子資料
+* 導入測試用種子資料
 
 `npx prisma db seed`
 
 ### 6.啟動開發伺服器
 
-啟動後端伺服器 (http://localhost:3001)
+* 啟動後端伺服器 (http://localhost:3001)
 
 `cd backend && pnpm dev`
 
-開啟新 Terminal 啟動前端伺服器 (http://localhost:3000)
+* 開啟新 Terminal 啟動前端伺服器 (http://localhost:3000)
 
 `cd frontend && pnpm dev`
 
