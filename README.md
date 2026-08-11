@@ -117,15 +117,15 @@ REALICIOUS/
 
 `cd REALICIOUS`
 
-### 2.安裝前後端套件
-
-`cd backend && pnpm install`
-
-`cd ../frontend && pnpm install`
-
-### 3.設定環境變數 (.env)
+### 2.設定環境變數 (.env)
 
 * 請分別在 backend/ 與 frontend/ 目錄下，參考 .env.example 建立 .env 檔案
+
+### 3.安裝後端套件
+
+`cd backend`
+
+`pnpm install`
 
 ### 4.資料庫初始化
 
@@ -133,9 +133,7 @@ REALICIOUS/
 
 `CREATE DATABASE realicious CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`
 
-### 5.執行 Migration 與 新增假資料
-
-`cd backend`
+### 5.後端執行 Migration 與 新增假資料
 
 * 執行資料庫 Migration
 
@@ -145,17 +143,31 @@ REALICIOUS/
 
 `npx prisma db seed`
 
-### 6.啟動開發伺服器
+* 執行 generate
+
+`npx prisma generate`
+
+### 6.啟動後端開發伺服器
 
 * 啟動後端伺服器 (http://localhost:3001)
 
-`cd backend && pnpm dev`
+`pnpm dev`
 
-* 開啟新 Terminal 啟動前端伺服器 (http://localhost:3000)
+### 7.安裝前端套件
 
-`cd frontend && pnpm dev`
+* 開啟新 Terminal
 
-### 7.測試帳密
+`cd frontend`
+
+`pnpm install`
+
+### 8.啟動前端伺服器
+
+* 啟動前端伺服器 (http://localhost:3000)
+
+`pnpm dev`
+
+### 8.測試帳密
 
 帳號：111@gmail.com
 
