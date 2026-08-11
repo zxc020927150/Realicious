@@ -4,6 +4,39 @@ Realicious 結合了復古可愛的 Pixel 元素，導入美式且具雜誌感�
 
 ---
 
+## 專案簡介
+
+* **開發背景**：本專案為 *4人團隊* 協作開發之前後端分離 Web 應用程式。
+* **主要目的**：提供使用者瀏覽熱門餐廳、發表食記、在線討論交流、購買電子票券、記帳，並包含完整的會員權限管理系統。
+  
+[點此查看完整企劃書 (PDF)](Realicious.pdf)
+
+---
+
+## 系統功能畫面
+
+### 1. 首頁
+
+![首頁](./frontend/public/readme/realicious.gif)
+
+### 2. 會員登入
+
+![會員登入](./frontend/public/readme/user.gif)
+
+### 3. 註冊
+
+![註冊](./frontend/public/readme/register.gif)
+
+### 4. 即時線上聊天室
+
+![即時線上聊天室](./frontend/public/readme/chatroom.gif)
+
+### 5. RWD 手機版
+
+![RWD 手機版](./frontend/public/readme/RWD.gif)
+
+---
+
 ## 前端
 
 * **Framework**： Next.js ( App Router ) / React
@@ -23,15 +56,6 @@ Realicious 結合了復古可愛的 Pixel 元素，導入美式且具雜誌感�
 
 * **Package Manager**： pnpm
 * **Version Control**： Git / GitHub
-
----
-
-## 專案簡介
-
-* **開發背景**：本專案為 *4人團隊* 協作開發之前後端分離 Web 應用程式。
-* **主要目的**：提供使用者瀏覽熱門餐廳、發表食記、在線討論交流、購買電子票券、記帳，並包含完整的會員權限管理系統。
-  
-[點此查看完整企劃書 (PDF)](Realicious.pdf)
 
 ---
 
@@ -62,25 +86,11 @@ Realicious 結合了復古可愛的 Pixel 元素，導入美式且具雜誌感�
    * 可選擇預設可愛小雞圖片或是自行上傳大頭貼
    * google 登入自動代入 google 帳號大頭貼
 
----
+8. **響應式網頁設計**
+   * 負責登入頁、註冊流程、會員中心、聊天室、側邊欄的設計
 
-## 系統功能畫面
-
-### 1. 首頁
-
-![首頁](./frontend/public/readme/realicious.gif)
-
-### 2. 會員登入
-
-![會員登入](./frontend/public/readme/user.gif)
-
-### 3. 註冊
-
-![註冊](./frontend/public/readme/register.gif)
-
-### 4. 即時線上聊天室
-
-![即時線上聊天室](./frontend/public/readme/chatroom.gif)
+9. **email驗證**
+   * 註冊或忘記密碼時，需驗證 email，使用 nodemailer 套件發送驗證信件
 
 ---
 
