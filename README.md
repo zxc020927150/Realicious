@@ -1,56 +1,64 @@
-# Realicious - 食刻
+# 食刻 - Realicious
 
->Realicious 結合了復古可愛的 Pixel 元素,導入美式且具雜誌感的視覺體驗。平台核心功能緊扣當代消費者的美食生活圈:透過美食文章與真實評論,多人線上聊天室,搭配多功能的美食商城,並將日常餐費記錄與小雞結合,增加使用者的趣味性。
+Realicious 結合了復古可愛的 Pixel 元素，導入美式且具雜誌感的視覺體驗。平台核心功能緊扣當代消費者的美食生活圈：透過美食文章與真實評論，多人線上聊天室，搭配多功能的美食商城，並將日常餐費記錄與小雞結合，增加使用者的趣味性。
 
 ---
 
-## 前端 (Frontend)
+## 前端
 
-* **Framework**: Next.js (App Router) / React
-* **Language**: TypeScript
-* **Styling**: Tailwind CSS
-* **Validation**: Zod (前端表單驗證)
+* **Framework**： Next.js ( App Router ) / React
+* **Language**： TypeScript
+* **Styling**： Tailwind CSS
+* **Validation**： Zod ( 前端表單驗證 )
 
-## 後端 (Backend)
+## 後端
 
-* **Runtime**: Node.js
-* **Framework**: Express.js
-* **Database & ORM**: MySQL / Prisma ORM
-* **Authentication**:  JWT / bcrypt 密碼雜湊
-* **Module System**: ES Modules
+* **Runtime**： Node.js
+* **Framework**： Express.js
+* **Database & ORM**： MySQL / Prisma ORM
+* **Authentication**：  JWT / bcrypt
+* **Module System**： ES Modules
 
 ## 開發工具與套件管理
 
-* **Package Manager**: pnpm
-* **Version Control**: Git / GitHub
-* **API Testing**: Postman
+* **Package Manager**： pnpm
+* **Version Control**： Git / GitHub
 
 ---
 
 ## 專案簡介
 
-* **開發背景**：本專案為 **4人團隊** 協作開發之前後端分離 Web 應用程式。
-* **主要目的**：提供使用者線上瀏覽熱門餐廳、發表食記、在線討論交流、購買電子票券、記帳，並包含完整的會員權限管理系統。
+* **開發背景**：本專案為 *4人團隊* 協作開發之前後端分離 Web 應用程式。
+* **主要目的**：提供使用者瀏覽熱門餐廳、發表食記、在線討論交流、購買電子票券、記帳，並包含完整的會員權限管理系統。
 
 ---
 
-## 我負責的部分
+## 團隊分配
 
 我主要負責 **「 會員管理系統 」與「 多人線上聊天室 」** 的設計與實作：
-
-### 核心負責模組與成就
 
 1. **會員身分驗證與安全機制**：
    * 採用 **JWT 認證機制** 管理會員登入狀態與權限控管。
    * 使用 **bcrypt** 實現密碼雜湊加密，確保使用者憑證安全。
+
 2. **即時聊天室**：
-   * 使用 Web Socket 的技術實做即時訊息推播、頻道劃分、以及連線狀態管理 ( 採用 Socket.io 套件 )
+   * 使用 Web Socket 的技術做到即時訊息推播、頻道劃分、以及連線狀態管理 ( 採用 Socket.io 套件 )
+
 3. **API 規劃與實作**：
-   * 設計並維護完整會員系統、聊天室 API 。
-4. **資料庫 Schema 設計 (MySQL)**：
+   * 設計完整會員系統、聊天室 API 。
+  
+4. **資料庫 Schema 設計**：
    * 規劃會員及聊天室相關資料表結構，並確立與其他區塊（如文章/購物）的關聯。
+  
 5. **Prisma ORM**：
    * 使用 Prisma 來管理資料表，並建立測試假資料 seed。
+  
+6. **第三方登入**
+   * 使用者可用 google 帳號進行登入
+  
+7. **自訂大頭貼**
+   * 可選擇預設可愛小雞圖片或是自行上傳大頭貼
+   * google 登入自動代入 google 帳號大頭貼
 
 ---
 
@@ -76,6 +84,7 @@
 
 ## 專案目錄結構
 
+```bash
 REALICIOUS/
 ├── backend/                       # 後端專案 (Node.js / Express / Prisma)
 │   ├── prisma/                    # 資料庫 Schema 與 Migration 設定
@@ -90,6 +99,7 @@ REALICIOUS/
 │
 ├── .gitignore                     # 全域 Git 過濾檔
 └── README.md                      # 專案說明文件
+```
 
 ## 環境設定與本地端啟動
 
